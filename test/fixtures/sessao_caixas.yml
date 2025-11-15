@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  usuario: one
+  data_abertura: 2025-11-13 12:35:08
+  valor_abertura: 9.99
+  data_fechamento: 2025-11-13 12:35:08
+  valor_fechamento_calculado: 9.99
+  valor_fechamento_real: 9.99
+
+two:
+  usuario: two
+  data_abertura: 2025-11-13 12:35:08
+  valor_abertura: 9.99
+  data_fechamento: 2025-11-13 12:35:08
+  valor_fechamento_calculado: 9.99
+  valor_fechamento_real: 9.99

@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  lote: one
+  usuario: one
+  tipo: MyString
+  quantidade: 1
+  motivo: MyText
+
+two:
+  lote: two
+  usuario: two
+  tipo: MyString
+  quantidade: 1
+  motivo: MyText

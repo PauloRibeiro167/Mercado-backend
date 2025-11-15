@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  data: 2025-11-12 21:43:49
+  descricao: MyString
+  valor: MyString
+  tipo: MyString
+  conta_pagar: one
+  conta_receber: one
+
+two:
+  data: 2025-11-12 21:43:49
+  descricao: MyString
+  valor: MyString
+  tipo: MyString
+  conta_pagar: two
+  conta_receber: two
