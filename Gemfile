@@ -2,12 +2,20 @@ source "https://rubygems.org"
 
 # Core Rails
 gem "rails", "~> 8.0.3"
+gem "rake", "~> 13.0"
 
 # Database
 gem "pg", "~> 1.1"
 
+# cores dentro do outputs do terminal
+gem "rainbow", "~> 3.0"
+gem "rouge", "~> 4.1"
+
+# Controle de altorização de acessos aos usuarios da aplicação
+gem "cancancan", "~> 3.4"
+
 # user
-gem 'devise', '~> 4.9', '>= 4.9.4'
+# gem "devise", "~> 4.9"
 
 # Server
 gem "puma", ">= 5.0"
@@ -28,7 +36,7 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 
 # Uncomment if needed
 # gem "jbuilder"
-# gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.7"
 # gem "image_processing", "~> 1.2"
 # gem "rack-cors"
 
