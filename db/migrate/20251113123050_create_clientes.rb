@@ -8,5 +8,7 @@ class CreateClientes < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_index :clientes, :cpf, unique: true
   end
 end

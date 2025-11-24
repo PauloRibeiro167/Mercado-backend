@@ -7,7 +7,7 @@ class CreateProdutoFornecedors < ActiveRecord::Migration[8.0]
       t.integer :prazo_entrega_dias
       t.string :codigo_fornecedor
       t.boolean :ativo
-      t.references :user, null: false, foreign_key: true
+      t.references :usuario, null: false, foreign_key: true
 
       t.timestamps
     end
