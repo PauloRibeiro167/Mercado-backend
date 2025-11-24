@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_15_220935) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "ajuste_estoques", force: :cascade do |t|
     t.bigint "lote_id", null: false
@@ -28,15 +56,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
 
   create_table "cargos", force: :cascade do |t|
     t.string "nome"
+    t.text "descricao"
+    t.text "atribuicoes"
+    t.bigint "criado_por_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["criado_por_id"], name: "index_cargos_on_criado_por_id"
     t.index ["nome"], name: "index_cargos_on_nome", unique: true
   end
 
   create_table "categoria", force: :cascade do |t|
     t.string "nome"
+    t.text "descricao"
+    t.text "imagem"
+    t.boolean "status", default: true, null: false
+    t.integer "ordem"
+    t.bigint "categoria_pai_id"
+    t.bigint "criado_por_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["categoria_pai_id"], name: "index_categoria_on_categoria_pai_id"
+    t.index ["criado_por_id"], name: "index_categoria_on_criado_por_id"
   end
 
   create_table "clientes", force: :cascade do |t|
@@ -46,6 +86,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
     t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["cpf"], name: "index_clientes_on_cpf", unique: true
   end
 
   create_table "conta_pagars", force: :cascade do |t|
@@ -93,12 +134,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
     t.string "lider_referencia"
     t.boolean "possui_contrato", default: false, null: false
     t.string "marca_representada"
-    t.bigint "user_id", null: false, comment: "Usuário que cadastrou o fornecedor"
+    t.bigint "usuario_id", null: false, comment: "Usuário que cadastrou o fornecedor"
     t.bigint "responsavel_id", null: false, comment: "Usuário responsável por contatos com este fornecedor"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["responsavel_id"], name: "index_fornecedors_on_responsavel_id"
-    t.index ["user_id"], name: "index_fornecedors_on_user_id"
+    t.index ["usuario_id"], name: "index_fornecedors_on_usuario_id"
   end
 
   create_table "funcionarios", force: :cascade do |t|
@@ -107,12 +148,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
     t.string "telefone"
     t.string "email"
     t.date "data_nascimento"
-    t.string "cargo"
+    t.bigint "cargo_id", null: false
     t.decimal "salario", precision: 10, scale: 2
-    t.bigint "user_id", null: false
+    t.bigint "usuario_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_funcionarios_on_user_id"
+    t.index ["cargo_id"], name: "index_funcionarios_on_cargo_id"
+    t.index ["usuario_id"], name: "index_funcionarios_on_usuario_id"
   end
 
   create_table "item_pedido_compras", force: :cascade do |t|
@@ -214,12 +256,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
     t.integer "prazo_entrega_dias"
     t.string "codigo_fornecedor"
     t.boolean "ativo"
-    t.bigint "user_id", null: false
+    t.bigint "usuario_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["fornecedor_id"], name: "index_produto_fornecedors_on_fornecedor_id"
     t.index ["produto_id"], name: "index_produto_fornecedors_on_produto_id"
-    t.index ["user_id"], name: "index_produto_fornecedors_on_user_id"
+    t.index ["usuario_id"], name: "index_produto_fornecedors_on_usuario_id"
   end
 
   create_table "produtos", force: :cascade do |t|
@@ -240,7 +282,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
 
   create_table "promocaos", force: :cascade do |t|
     t.bigint "produto_id", null: false
-    t.bigint "user_id", null: false
+    t.bigint "usuario_id", null: false
     t.string "tipo_promocao"
     t.decimal "preco_promocional", precision: 10, scale: 2
     t.datetime "data_inicio"
@@ -248,7 +290,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["produto_id"], name: "index_promocaos_on_produto_id"
-    t.index ["user_id"], name: "index_promocaos_on_user_id"
+    t.index ["usuario_id"], name: "index_promocaos_on_usuario_id"
   end
 
   create_table "sessao_caixas", force: :cascade do |t|
@@ -263,25 +305,41 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
     t.index ["usuario_id"], name: "index_sessao_caixas_on_usuario_id"
   end
 
-  create_table "users", force: :cascade do |t|
-    t.string "email", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-  end
-
   create_table "usuario_perfils", force: :cascade do |t|
-    t.bigint "user_id", null: false
+    t.bigint "usuario_id", null: false
     t.bigint "perfil_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["perfil_id"], name: "index_usuario_perfils_on_perfil_id"
-    t.index ["user_id"], name: "index_usuario_perfils_on_user_id"
+    t.index ["usuario_id"], name: "index_usuario_perfils_on_usuario_id"
+  end
+
+  create_table "usuarios", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "senha_digest", null: false
+    t.string "primeiro_nome", null: false
+    t.string "ultimo_nome", null: false
+    t.string "nome_usuario"
+    t.integer "papel", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.string "token_redefinicao_senha"
+    t.datetime "enviado_em_redefinicao_senha"
+    t.string "token_confirmacao"
+    t.datetime "confirmado_em"
+    t.datetime "enviado_em_confirmacao"
+    t.integer "contagem_acessos", default: 0, null: false
+    t.datetime "acesso_atual_em"
+    t.datetime "ultimo_acesso_em"
+    t.string "ip_acesso_atual"
+    t.string "ip_ultimo_acesso"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_usuarios_on_email", unique: true
+    t.index ["nome_usuario"], name: "index_usuarios_on_nome_usuario", unique: true
+    t.index ["papel"], name: "index_usuarios_on_papel"
+    t.index ["status"], name: "index_usuarios_on_status"
+    t.index ["token_confirmacao"], name: "index_usuarios_on_token_confirmacao", unique: true
+    t.index ["token_redefinicao_senha"], name: "index_usuarios_on_token_redefinicao_senha", unique: true
   end
 
   create_table "vendas", force: :cascade do |t|
@@ -296,12 +354,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
     t.index ["metodo_pagamento_id"], name: "index_vendas_on_metodo_pagamento_id"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ajuste_estoques", "lotes"
+  add_foreign_key "cargos", "usuarios", column: "criado_por_id"
+  add_foreign_key "categoria", "categoria", column: "categoria_pai_id"
+  add_foreign_key "categoria", "usuarios", column: "criado_por_id"
   add_foreign_key "conta_pagars", "fornecedors"
   add_foreign_key "conta_pagars", "pedido_compras"
-  add_foreign_key "fornecedors", "users"
-  add_foreign_key "fornecedors", "users", column: "responsavel_id"
-  add_foreign_key "funcionarios", "users"
+  add_foreign_key "fornecedors", "usuarios"
+  add_foreign_key "fornecedors", "usuarios", column: "responsavel_id"
+  add_foreign_key "funcionarios", "cargos"
+  add_foreign_key "funcionarios", "usuarios"
   add_foreign_key "item_pedido_compras", "pedido_compras"
   add_foreign_key "item_pedido_compras", "produtos"
   add_foreign_key "item_vendas", "lotes"
@@ -314,11 +378,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_13_140408) do
   add_foreign_key "perfil_permissaos", "permissaos"
   add_foreign_key "produto_fornecedors", "fornecedors"
   add_foreign_key "produto_fornecedors", "produtos"
-  add_foreign_key "produto_fornecedors", "users"
+  add_foreign_key "produto_fornecedors", "usuarios"
   add_foreign_key "produtos", "categoria", column: "categoria_id"
   add_foreign_key "promocaos", "produtos"
-  add_foreign_key "promocaos", "users"
+  add_foreign_key "promocaos", "usuarios"
   add_foreign_key "usuario_perfils", "perfils"
-  add_foreign_key "usuario_perfils", "users"
+  add_foreign_key "usuario_perfils", "usuarios"
   add_foreign_key "vendas", "metodo_pagamentos"
 end

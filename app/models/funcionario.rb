@@ -1,3 +1,4 @@
 class Funcionario < ApplicationRecord
-  belongs_to :user, optional: true
+  belongs_to :usuario, optional: false
+  belongs_to :cargo, optional: false
 end

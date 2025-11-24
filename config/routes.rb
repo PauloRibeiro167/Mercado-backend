@@ -2,8 +2,8 @@ Rails.application.routes.draw do
   resources :cargos
   resources :permissaos
   resources :perfils
+  resources :users
   resources :funcionarios
-  devise_for :users
   resources :sessao_caixas
   resources :ajuste_estoques
   resources :clientes

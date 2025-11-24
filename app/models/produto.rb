@@ -1,5 +1,5 @@
 class Produto < ApplicationRecord
-  belongs_to :categoria
+  belongs_to :categoria, class_name: 'Categoria'
   has_many :lotes, dependent: :destroy
   has_many :item_pedido_compras, dependent: :destroy
   has_many :promocaos, dependent: :destroy

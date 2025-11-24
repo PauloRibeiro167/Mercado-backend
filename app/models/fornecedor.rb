@@ -1,4 +1,4 @@
 class Fornecedor < ApplicationRecord
-  belongs_to :user
-  belongs_to :responsavel, class_name: 'User'
+  belongs_to :usuario
+  belongs_to :responsavel, class_name: 'Usuario'
 end

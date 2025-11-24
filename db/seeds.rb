@@ -3,15 +3,14 @@
 # Os dados podem então ser carregados com o comando bin/rails db:seed (ou criados junto com o banco de dados usando db:setup).
 
 # Carregar seeds individuais
-load Rails.root.join('db/seeds/users.rb')
-load Rails.root.join('db/seeds/cargos.rb')
+load Rails.root.join('db/seeds/usuarios.rb') # feito 
+load Rails.root.join('db/seeds/cargos.rb') #feito
 load Rails.root.join('db/seeds/funcionarios.rb')
 load Rails.root.join('db/seeds/perfils.rb')
 load Rails.root.join('db/seeds/permissaos.rb')
 load Rails.root.join('db/seeds/categoria.rb')
 load Rails.root.join('db/seeds/perfil_permissaos.rb')
 load Rails.root.join('db/seeds/usuario_perfils.rb')
-load Rails.root.join('db/seeds/produtos.rb')
 load Rails.root.join('db/seeds/fornecedors.rb')
 load Rails.root.join('db/seeds/lotes.rb')
 load Rails.root.join('db/seeds/pedido_compras.rb')
