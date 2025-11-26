@@ -12,7 +12,8 @@ gem "rainbow", "~> 3.0"
 gem "rouge", "~> 4.1"
 
 # Controle de altorização de acessos aos usuarios da aplicação
-gem "cancancan", "~> 3.4"
+gem "rolify", "~> 6.0"
+gem "pundit", "~> 2.5", ">= 2.5.2"
 
 # user
 # gem "devise", "~> 4.9"
