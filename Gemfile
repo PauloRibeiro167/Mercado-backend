@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Core Rails
-gem "rails", "~> 8.0.3"
+gem "rails", "~> 8.1.1"
 gem "rake", "~> 13.0"
 
 # Database
