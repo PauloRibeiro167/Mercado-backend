@@ -26,6 +26,7 @@ RUN apt-get update && \
   gosu \
   && echo "pt_BR.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen pt_BR.UTF-8 \
+  && apt-get install -y --no-install-recommends net-tools lsof \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ENV LANG=pt_BR.UTF-8
@@ -39,7 +40,7 @@ RUN gem install bundler
 
 # Instalar dependências do backend Rails
 RUN mkdir -p /workspaces/backend
-COPY backend/Gemfile backend/Gemfile.lock /workspaces/backend/
+COPY api/Gemfile api/Gemfile.lock /workspaces/backend/
 RUN cd /workspaces/backend && bundle install
 
 

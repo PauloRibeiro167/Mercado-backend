@@ -11,7 +11,6 @@ ENV_FILE = .env.development
 DOCKERFILE ?= .devcontainer/Dockerfile
 IMAGE_NAME ?= $(PROJECT_NAME)_image
 DOCKERFILE_DEPS = $(shell cat $(DOCKERFILE) | tr '\n' ' ' | sed 's/.*apt-get install -y --no-install-recommends //;s/ &&.*//')
-APP_SERVICE_NAME = mercado-app
 APP_SERVICE_BACKEND = mercado-backend-app
 PROJECT_NAME ?= $(shell grep -E '^(export )?PROJECT_NAME=' $(ENV_FILE) | sed 's/^export //' | cut -d '=' -f2)
 DB ?= $(shell grep -E '^DB=' $(ENV_FILE) | cut -d '=' -f2)
@@ -20,11 +19,11 @@ DB_NAME ?= $(shell grep -E '^(export )?POSTGRES_DB=' $(ENV_FILE) | sed 's/^expor
 DOCKER = docker compose -f $(COMPOSE_FILE)  --env-file $(ENV_FILE) -p $(PROJECT_NAME)
 NOCACHE ?= 0
 MAKEFLAGS += --no-print-directory
-BACKEND_WORKDIR ?= /workspaces/backend
+BACKEND_WORKDIR ?= /workspaces/api
 BACKEND_PORT ?= 3000
 PROJECT_WORKDIR ?= /workspaces
 
-.PHONY: help build build-no-cache rebuild up down exec exec-workspace exec-ui logs logs-backend ps db-shell clean env-check rm-env regen-env
+.PHONY: help build build-no-cache rebuild up down exec exec-workspace exec-backend start-backend logs ps db-shell clean env-check rm-env regen-env
 
 help:
 	@printf "$(CYAN)Comandos disponíveis:$(NC)\n"
@@ -36,8 +35,8 @@ help:
 	@printf "  $(BLUE)down$(NC)         		$(YELLOW)- Para e remove todos os containers abertos.$(NC)\n"
 	@printf "  $(BLUE)exec$(NC)         		$(YELLOW)- Inicia backend (-d) e abre shell no workspace do projeto.$(NC)\n"
 	@printf "  $(BLUE)exec-workspace$(NC)		$(YELLOW)- Abre shell no workspace do projeto (sem iniciar backend).$(NC)\n"
-	@printf "  $(BLUE)logs$(NC)         		$(YELLOW)- Mostra os logs do container da UI.$(NC)\n"
-	@printf "  $(BLUE)logs-backend$(NC)		$(YELLOW)- Mostra os logs do container do backend.$(NC)\n"
+	@printf "  $(BLUE)exec-backend$(NC)		$(YELLOW)- Abre shell no container do backend.$(NC)\n"
+	@printf "  $(BLUE)logs$(NC)         		$(YELLOW)- Mostra os logs do container do backend.$(NC)\n"
 	@printf "  $(BLUE)ps$(NC)           		$(YELLOW)- Lista os containers do projeto.$(NC)\n"
 	@printf "  $(BLUE)db-shell$(NC)     		$(YELLOW)- Acessa o shell do banco de dados.$(NC)\n"
 	@printf "  $(BLUE)clean$(NC)        		$(YELLOW)- Limpa o ambiente Docker.$(NC)\n\n"
@@ -75,6 +74,13 @@ up:
 	@printf "$(GREEN)Containers estão rodando.$(NC)\n"
 
 down:
+	@printf "$(YELLOW)Parando o servidor Rails se estiver rodando...$(NC)\n"
+	@$(DOCKER) exec $(APP_SERVICE_BACKEND) bash -lc '\
+	if [ -f /workspaces/api/tmp/pids/server.pid ]; then \
+	  pid=$$(cat /workspaces/api/tmp/pids/server.pid 2>/dev/null || true); \
+	  if [ -n "$$pid" ]; then kill -9 "$$pid" 2>/dev/null || true; fi; \
+	  rm -f /workspaces/api/tmp/pids/server.pid; \
+	fi' 2>/dev/null || true
 	@printf "$(YELLOW)Parando e removendo todos os containers, volumes e redes do projeto...$(NC)\n"
 	@$(DOCKER) down -v --remove-orphans
 
@@ -83,26 +89,6 @@ exec:
 	@$(MAKE) start-backend
 	@printf "$(CYAN)Abrindo workspace do projeto...$(NC)\n"
 	@$(MAKE) exec-workspace
-
-exec-ui:
-	@set -e; \
-	container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_NAME) 2>/dev/null) || true; \
-	if [ -z "$$container_id" ]; then \
-		$(MAKE) up; \
-		sleep 3; \
-		container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_NAME) 2>/dev/null) || true; \
-		[ -z "$$container_id" ] && printf "$(RED)Falha ao iniciar o container da UI $(APP_SERVICE_NAME).$(NC)\n" && exit 1; \
-	fi; \
-	detected_root=$$($(DOCKER) exec $(APP_SERVICE_NAME) bash -lc '\
-		set -e; for d in "$(PROJECT_WORKDIR)" /workspaces /workspace /; do \
-			if [ -d "$$d" ] && [ -d "$$d/backend" ] && [ -d "$$d/ui" ]; then echo "$$d"; exit 0; fi; \
-		done; echo ""'); \
-	if [ -z "$$detected_root" ]; then \
-		printf "$(RED)Não foi possível localizar a raiz do projeto dentro do container da UI.$(NC)\n"; \
-		printf "$(YELLOW)Defina PROJECT_WORKDIR (ex.: /workspaces).$(NC)\n"; \
-		exit 1; \
-	fi; \
-	$(DOCKER) exec -e PROJECT_NAME="$(PROJECT_NAME)" -e CONTAINER_ID="$$container_id" -e DETECTED_ROOT="$$detected_root" -it $(APP_SERVICE_NAME) bash -lc 'cd "$$DETECTED_ROOT/ui"; export PS1="\[\e[1;34m\]${PROJECT_NAME}-ui:\w:\[\e[0m\] "; exec bash --noprofile --norc' || true
 
 exec-backend:
 	@set -e; \
@@ -125,51 +111,7 @@ exec-backend:
 	fi; \
 	$(DOCKER) exec -e PROJECT_NAME="$(PROJECT_NAME)" -e CONTAINER_ID="$$container_id" -it $(APP_SERVICE_BACKEND) bash -lc 'cd "$$detected_dir"; export PS1="\[\e[1;34m\]${PROJECT_NAME}-backend:\w:\[\e[0m\] "; exec bash --noprofile --norc' || true
 
-# Inicia o Rails do backend dentro do container em modo detach
-start-backend:
-	@set -e; \
-	container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_BACKEND) 2>/dev/null) || true; \
-	if [ -z "$$container_id" ]; then \
-		$(MAKE) up; \
-		sleep 4; \
-		container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_BACKEND) 2>/dev/null) || true; \
-		[ -z "$$container_id" ] && printf "$(RED)Falha ao iniciar o container do backend.$(NC)\n" && exit 1; \
-	fi; \
-	port=$$(grep -E '^(export )?(BACKEND_PORT|RAILS_PORT)=' "$(ENV_FILE)" 2>/dev/null | sed 's/^export //' | tail -n1 | cut -d'=' -f2); \
-	[ -z "$$port" ] && port="$(BACKEND_PORT)"; \
-	detected_dir=$$($(DOCKER) exec $(APP_SERVICE_BACKEND) bash -lc '\
-		set -e; cand=""; \
-		if [ -d "$(BACKEND_WORKDIR)" ] && [ -e "$(BACKEND_WORKDIR)/bin/rails" ]; then cand="$(BACKEND_WORKDIR)"; \
-		else for d in /workspaces/backend /workspace/backend /workspaces/*/backend /app /srv/app; do \
-			if [ -d "$$d" ] && [ -e "$$d/bin/rails" ]; then cand="$$d"; break; fi; \
-		done; fi; echo "$$cand"'); \
-	[ -z "$$detected_dir" ] && printf "$(RED)Não foi possível detectar o diretório do backend dentro do container.$(NC)\n" && exit 1; \
-	already_running=$$($(DOCKER) exec $(APP_SERVICE_BACKEND) bash -lc 'pgrep -fa "puma|rails s" | grep -q "$$detected_dir" && echo yes || echo no' 2>/dev/null || echo no); \
-	if [ "$$already_running" = "yes" ]; then \
-		printf "$(GREEN)Backend Rails já está em execução em $$detected_dir na porta $$port.$(NC)\n"; \
-		exit 0; \
-	fi; \
-	printf "$(GREEN)Iniciando Rails em detach (-d) em $$detected_dir na porta $$port...$(NC)\n"; \
-	$(DOCKER) exec -d $(APP_SERVICE_BACKEND) bash -lc '\
-		set -e; cd "$$detected_dir"; \
-		if [ -x bin/rails ]; then bin/rails s -b 0.0.0.0 -p '"$$port"' -e development; \
-		elif command -v bundle >/dev/null 2>&1; then bundle exec rails s -b 0.0.0.0 -p '"$$port"' -e development; \
-		else rails s -b 0.0.0.0 -p '"$$port"' -e development; fi' || { printf "$(RED)Falha ao iniciar o Rails.$(NC)\n"; exit 1; }; \
-	printf "$(GREEN)Rails iniciado em background. Porta: $$port. Use 'make logs-backend' para ver os logs.$(NC)\n"
-
 logs:
-	@printf '$(MAGENTA)Mostrando logs do serviço $(APP_SERVICE_NAME)...$(NC)\n'
-	container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_NAME)); \
-	if [ -z "$$container_id" ]; then \
-		printf "$(RED)Nenhum container em execução encontrado para o serviço $(APP_SERVICE_NAME).$(NC)\n"; \
-		printf "$(YELLOW)Você pode iniciar os containers com 'make up'.$(NC)\n"; \
-		exit 1; \
-	fi; \
-	printf "$(CYAN)Anexando aos logs... (Pressione Ctrl+C para sair)$(NC)\n"; \
-	printf "$(YELLOW)Nota: O container pode não estar gerando logs se estiver ocioso.$(NC)\n"; \
-	$(DOCKER) logs -f $(APP_SERVICE_NAME) || true
-
-logs-backend:
 	@container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_BACKEND) 2>/dev/null) || true; \
 	if [ -z "$$container_id" ]; then \
 		printf "$(YELLOW)Container do serviço $(APP_SERVICE_BACKEND) não está rodando. Iniciando com 'make up'...$(NC)\n"; \
@@ -266,17 +208,49 @@ rm-env:
 	@echo "Se existir .devcontainer/.env.devcontainer.example e você quiser removê-lo, execute:" \
 		&& echo "  rm .devcontainer/.env.devcontainer.example" || true
 
-regen-env:
-	@printf "$(CYAN)Regenerando .env.development...$(NC)\n"
-	@if [ -f "$(ENV_FILE)" ]; then \
-		printf "$(YELLOW)Removendo $(ENV_FILE)...$(NC)\n"; \
-		rm -f "$(ENV_FILE)"; \
+start-backend:
+	@set -e; \
+	container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_BACKEND) 2>/dev/null) || true; \
+	if [ -z "$$container_id" ]; then \
+		$(MAKE) up; \
+		sleep 4; \
+		container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_BACKEND) 2>/dev/null) || true; \
+		[ -z "$$container_id" ] && printf "$(RED)Falha ao iniciar o container do backend.$(NC)\n" && exit 1; \
 	fi; \
-	if [ "$$MAKE_INTERACTIVE" = "1" ]; then \
-		printf "$(CYAN)Modo interativo: iniciando container para prompts...$(NC)\n"; \
-		$(DOCKER) run --rm -e INTERACTIVE_ENV=1 -it $(APP_SERVICE_NAME) bash; \
-	else \
-		printf "$(CYAN)Subindo containers para gerar novo env (não-interativo)...$(NC)\n"; \
-		$(DOCKER) up --build -d || true; \
-		printf "$(GREEN)Regeneração finalizada.$(NC)\n"; \
-	fi
+	detected_dir=$$($(DOCKER) exec $(APP_SERVICE_BACKEND) bash -lc '\
+		set -e; cand=""; \
+		if [ -d "$(BACKEND_WORKDIR)" ] && [ -e "$(BACKEND_WORKDIR)/bin/rails" ]; then cand="$(BACKEND_WORKDIR)"; \
+		else for d in /workspaces/backend /workspace/backend /workspaces/*/backend /app /srv/app; do \
+			if [ -d "$$d" ] && [ -e "$$d/bin/rails" ]; then cand="$$d"; break; fi; \
+		done; fi; echo "$$cand"'); \
+	if [ -z "$$detected_dir" ]; then \
+		printf "$(RED)Não foi possível detectar o diretório do backend dentro do container.$(NC)\n"; \
+		exit 1; \
+	fi; \
+	$(DOCKER) exec $(APP_SERVICE_BACKEND) bash -lc 'cd "'"$$detected_dir"'"; \
+	if [ -f tmp/pids/server.pid ]; then \
+	  pid=$$(cat tmp/pids/server.pid 2>/dev/null || true); \
+	  if [ -n "$$pid" ]; then kill -9 "$$pid" 2>/dev/null || true; fi; \
+	  rm -f tmp/pids/server.pid; \
+	fi'
+
+exec-workspace:
+	@set -e; \
+	container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_BACKEND) 2>/dev/null) || true; \
+	if [ -z "$$container_id" ]; then \
+		$(MAKE) up; \
+		sleep 4; \
+		container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_BACKEND) 2>/dev/null) || true; \
+		[ -z "$$container_id" ] && printf "$(RED)Falha ao iniciar o container do backend.$(NC)\n" && exit 1; \
+	fi; \
+	detected_dir=$$($(DOCKER) exec $(APP_SERVICE_BACKEND) bash -lc '\
+		set -e; cand=""; \
+		if [ -d "$(BACKEND_WORKDIR)" ] && [ -e "$(BACKEND_WORKDIR)/bin/rails" ]; then cand="$(BACKEND_WORKDIR)"; \
+		else for d in /workspaces/backend /workspace/backend /workspaces/*/backend /app /srv/app; do \
+			if [ -d "$$d" ] && [ -e "$$d/bin/rails" ]; then cand="$$d"; break; fi; \
+		done; fi; echo "$$cand"'); \
+	if [ -z "$$detected_dir" ]; then \
+		printf "$(RED)Não foi possível detectar o diretório do backend dentro do container.$(NC)\n"; \
+		exit 1; \
+	fi; \
+	$(DOCKER) exec -e PROJECT_NAME="$(PROJECT_NAME)" -e CONTAINER_ID="$$container_id" -it $(APP_SERVICE_BACKEND) bash -lc 'cd "$$detected_dir"; export PS1="\[\e[1;34m\]${PROJECT_NAME}-backend:\w:\[\e[0m\] "; exec bash --noprofile --norc' || true

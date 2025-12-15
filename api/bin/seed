@@ -10,16 +10,16 @@ rm -f db/schema.rb
 echo "Arquivo db/schema.rb removido."
 
 # Run the Rails database commands with error checking
-echo "Executando rails db:drop..."
-rails db:drop
+echo "Executando bin/rails db:drop..."
+bin/rails db:drop
 
-echo "Executando rails db:create..."
-rails db:create
+echo "Executando bin/rails db:create..."
+bin/rails db:create
 
-echo "Executando rails db:migrate..."
-rails db:migrate
+echo "Executando bin/rails db:migrate..."
+bin/rails db:migrate
 
-echo "Executando rails db:seed..."
-rails db:seed
+echo "Executando bin/rails db:seed..."
+bin/rails db:seed
 
 # echo "Reset do banco de dados concluído com sucesso!"

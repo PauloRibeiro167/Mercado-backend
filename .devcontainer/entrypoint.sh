@@ -138,7 +138,7 @@ fi
 
 # Função: tornar executáveis todos os scripts do diretório bin
 make_bin_scripts_executable() {
-  local bin_dir="$BASE_DIR/bin"
+  local bin_dir="/workspaces/api/bin"
   
   if [ ! -d "$bin_dir" ]; then
     echo "[INFO] Diretório $bin_dir não encontrado, pulando configuração de permissões dos scripts" >&2
@@ -173,7 +173,7 @@ make_bin_scripts_executable() {
 
 # Função: instalar dependências Ruby (bundle install) para o backend
 install_ruby_dependencies() {
-  local backend_dir="/workspaces/backend"
+  local backend_dir="/workspaces/api"
   
   if [ ! -f "$backend_dir/Gemfile" ]; then
     echo "[INFO] Gemfile não encontrado em $backend_dir, pulando instalação de dependências Ruby" >&2

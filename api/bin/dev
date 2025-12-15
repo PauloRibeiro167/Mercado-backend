@@ -1,2 +1,7 @@
 #!/usr/bin/env ruby
-exec "./bin/rails", "server", *ARGV
+
+# Garante que o servidor Rails fique acessível fora do container,
+# fazendo bind em 0.0.0.0 na porta configurada (padrão 3000).
+port = ENV.fetch("PORT", "3000")
+
+exec "./bin/rails", "server", "-b", "0.0.0.0", "-p", port, *ARGV
