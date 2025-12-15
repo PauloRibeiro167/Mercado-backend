@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+require 'bundler/setup'
+require 'rake'
+require_relative '../config/application'
+
+Rails.application.load_tasks
+
+# Apagar o arquivo ERD existente antes de gerar um novo
+File.delete('erd.pdf') if File.exist?('erd.pdf')
+
+Rake::Task['erd:generate'].invoke

@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  pedido_compra: one
+  tipo_pagamento: MyString
+  valor_pago: 9.99
+
+two:
+  pedido_compra: two
+  tipo_pagamento: MyString
+  valor_pago: 9.99

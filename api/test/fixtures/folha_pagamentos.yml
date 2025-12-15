@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  funcionario: one
+  usuario: one
+  data_referencia: 2025-12-03
+  dias_trabalhados: 1
+  horas_extras: 9.99
+  salario_base: 9.99
+  adicional_horas_extras: 9.99
+  inss: 9.99
+  fgts: 9.99
+  total_liquido: 9.99
+  processada: false
+  conta_pagar: one
+
+two:
+  funcionario: two
+  usuario: two
+  data_referencia: 2025-12-03
+  dias_trabalhados: 1
+  horas_extras: 9.99
+  salario_base: 9.99
+  adicional_horas_extras: 9.99
+  inss: 9.99
+  fgts: 9.99
+  total_liquido: 9.99
+  processada: false
+  conta_pagar: two

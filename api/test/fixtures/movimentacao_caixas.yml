@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  data: 2025-12-05 22:38:37
+  descricao: MyString
+  valor: 9.99
+  tipo: MyString
+  usuario: one
+  caixa: one
+  origem: one
+  origem_type: Origem
+  sessao_caixa: one
+
+two:
+  data: 2025-12-05 22:38:37
+  descricao: MyString
+  valor: 9.99
+  tipo: MyString
+  usuario: two
+  caixa: two
+  origem: two
+  origem_type: Origem
+  sessao_caixa: two

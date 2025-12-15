@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Interrompe o script em caso de erro
+set -e
+
+echo "Iniciando reset do banco de dados..."
+
+# Delete the schema.rb file
+rm -f db/schema.rb
+echo "Arquivo db/schema.rb removido."
+
+# Run the Rails database commands with error checking
+echo "Executando rails db:drop..."
+rails db:drop
+
+echo "Executando rails db:create..."
+rails db:create
+
+echo "Executando rails db:migrate..."
+rails db:migrate
+
+echo "Executando rails db:seed..."
+rails db:seed
+
+# echo "Reset do banco de dados concluído com sucesso!"

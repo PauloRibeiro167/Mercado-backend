@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  funcionario: one
+  data: 2025-12-03
+  hora_entrada: 2025-12-03 13:30:37
+  hora_saida: 2025-12-03 13:30:37
+  horas_trabalhadas: 9.99
+  aprovado: false
+
+two:
+  funcionario: two
+  data: 2025-12-03
+  hora_entrada: 2025-12-03 13:30:37
+  hora_saida: 2025-12-03 13:30:37
+  horas_trabalhadas: 9.99
+  aprovado: false

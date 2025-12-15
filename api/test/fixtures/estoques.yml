@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  produto: one
+  lote: one
+  quantidade_atual: 1
+  quantidade_minima: 1
+  quantidade_ideal: 1
+  media_vendas_diarias: 9.99
+  localizacao: MyString
+  ultima_atualizacao: 2025-12-04 16:36:36
+
+two:
+  produto: two
+  lote: two
+  quantidade_atual: 1
+  quantidade_minima: 1
+  quantidade_ideal: 1
+  media_vendas_diarias: 9.99
+  localizacao: MyString
+  ultima_atualizacao: 2025-12-04 16:36:36

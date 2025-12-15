@@ -1,0 +1,26 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>
+  username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD") { "" } %>
+  host: postgres
+  port: 5432
+
+test:
+  <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>_test
+  username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD") { "" } %>
+  host: postgres
+  port: 5432
+
+production:
+  <<: *default
+  database: mercado_backend_production
+  username: mercado_backend
+  password: <%= ENV["MERCADO_BACKEND_DATABASE_PASSWORD"] %>

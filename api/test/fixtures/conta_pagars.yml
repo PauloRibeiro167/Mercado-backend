@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  fornecedor: one
+  pedido_compra: one
+  descricao: MyString
+  valor: MyString
+  data_vencimento: 2025-11-12
+  data_pagamento: 2025-11-12
+  status: MyString
+
+two:
+  fornecedor: two
+  pedido_compra: two
+  descricao: MyString
+  valor: MyString
+  data_vencimento: 2025-11-12
+  data_pagamento: 2025-11-12
+  status: MyString

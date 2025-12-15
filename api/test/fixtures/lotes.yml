@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  produto: one
+  quantidade_atual: 1
+  quantidade_inicial: 1
+  preco_custo: 9.99
+  data_validade: 2025-11-13
+  data_entrada: 2025-11-13
+
+two:
+  produto: two
+  quantidade_atual: 1
+  quantidade_inicial: 1
+  preco_custo: 9.99
+  data_validade: 2025-11-13
+  data_entrada: 2025-11-13

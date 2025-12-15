@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  produto: one
+  tipo_promocao: MyString
+  preco_promocional: MyString
+  data_inicio: 2025-11-12 21:37:14
+  data_fim: 2025-11-12 21:37:14
+
+two:
+  produto: two
+  tipo_promocao: MyString
+  preco_promocional: MyString
+  data_inicio: 2025-11-12 21:37:14
+  data_fim: 2025-11-12 21:37:14

@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  produto: one
+  fornecedor: one
+  preco_custo: 9.99
+  prazo_entrega_dias: 1
+  codigo_fornecedor: MyString
+  ativo: false
+  usuario: one
+
+two:
+  produto: two
+  fornecedor: two
+  preco_custo: 9.99
+  prazo_entrega_dias: 1
+  codigo_fornecedor: MyString
+  ativo: false
+  usuario: two

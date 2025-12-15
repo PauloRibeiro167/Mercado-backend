@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  pedido_compra: one
+  produto: one
+  quantidade: 1
+  preco_custo_negociado: MyString
+
+two:
+  pedido_compra: two
+  produto: two
+  quantidade: 1
+  preco_custo_negociado: MyString

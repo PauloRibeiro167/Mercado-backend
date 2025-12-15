@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  venda: one
+  cliente: one
+  descricao: MyString
+  valor: MyString
+  data_vencimento: 2025-11-12
+  data_recebimento: 2025-11-12
+  status: MyString
+
+two:
+  venda: two
+  cliente: two
+  descricao: MyString
+  valor: MyString
+  data_vencimento: 2025-11-12
+  data_recebimento: 2025-11-12
+  status: MyString

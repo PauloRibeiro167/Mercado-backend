@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  status: MyString
+  subtotal: MyString
+  valor_taxa: MyString
+  metodo_pagamento: one
+  data_venda: 2025-11-12 21:49:43
+
+two:
+  status: MyString
+  subtotal: MyString
+  valor_taxa: MyString
+  metodo_pagamento: two
+  data_venda: 2025-11-12 21:49:43
