@@ -1,6 +1,4 @@
-module Api
-  module V1
-    class TiposContratosController < ApplicationController
+class Api::V1::TiposContratosController < ApplicationController
   before_action :set_tipos_contrato, only: %i[ show update destroy ]
 
   rescue_from ActiveRecord::RecordNotFound do
@@ -48,46 +46,43 @@ module Api
     render json: { success: true, message: "Tipo de contrato removido com sucesso" }, status: :ok
   end
 
-  private
+private
 
-    def set_tipos_contrato
-      @tipos_contrato = TiposContrato.find(params.require(:id))
-    end
+  def set_tipos_contrato
+    @tipos_contrato = TiposContrato.find(params.require(:id))
+  end
 
-    def tipos_contrato_params
-      params.require(:tipos_contrato).permit(:nome, :descricao, :ativo)
-    end
+  def tipos_contrato_params
+    params.require(:tipos_contrato).permit(:nome, :descricao, :ativo)
+  end
 
-    def render_errors(record)
-      errors = record.errors.map do |error|
-        {
-          campo: error.attribute.to_s,
-          mensagem: error.message
-        }
-      end
-      render json: { success: false, errors: errors }, status: :unprocessable_entity
-    end
-
-    def render_invalid_enum(_error)
-      render json: {
-        success: false,
-        errors: [
-          { campo: "tipo", mensagem: "valor inválido para tipo" }
-        ]
-      }, status: :unprocessable_entity
-    end
-
-    def format_tipos_contrato_json(tipo)
+  def render_errors(record)
+    errors = record.errors.map do |error|
       {
-        id: tipo.id,
-        nome: tipo.nome,
-        descricao: tipo.descricao,
-        ativo: tipo.ativo,
-        created_at: tipo.created_at,
-        updated_at: tipo.updated_at
+        campo: error.attribute.to_s,
+        mensagem: error.message
       }
     end
-end
+    render json: { success: false, errors: errors }, status: :unprocessable_entity
+  end
 
+  def render_invalid_enum(_error)
+    render json: {
+      success: false,
+      errors: [
+        { campo: "tipo", mensagem: "valor inválido para tipo" }
+      ]
+    }, status: :unprocessable_entity
+  end
+
+  def format_tipos_contrato_json(tipo)
+    {
+      id: tipo.id,
+      nome: tipo.nome,
+      descricao: tipo.descricao,
+      ativo: tipo.ativo,
+      created_at: tipo.created_at,
+      updated_at: tipo.updated_at
+    }
   end
 end
