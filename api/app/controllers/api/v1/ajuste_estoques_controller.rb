@@ -1,3 +1,7 @@
+# Controller responsável pela gestão de ajustes de estoque.
+# @see UseCases::Estoque::RegistrarAjuste
+# @note Regra de negócio: qualquer alteração de estoque deve ser delegada ao caso de uso `UseCases::Estoque::RegistrarAjuste`,
+#   que garante validação de lote, tipo de ajuste e atualização consistente das quantidades.
 class Api::V1::AjusteEstoquesController < ApplicationController
   before_action :set_ajuste_estoque, only: %i[show update destroy]
 
@@ -6,17 +10,24 @@ class Api::V1::AjusteEstoquesController < ApplicationController
   end
 
   # GET /ajuste_estoques
+  # @return [Array<Hash>]
+  # @note Exibe os ajustes já persistidos sem alterar estoque.
   def index
     @ajuste_estoques = AjusteEstoque.all
     render json: @ajuste_estoques.map { |ajuste| format_ajuste_json(ajuste) }
   end
 
   # GET /ajuste_estoques/1
+  # @return [Hash]
+  # @note Apenas leitura; não altera os saldos.
   def show
     render json: format_ajuste_json(@ajuste_estoque)
   end
 
   # POST /ajuste_estoques
+  # @return [void]
+  # @see UseCases::Estoque::RegistrarAjuste
+  # @note Regra de negócio: delega ajustes ao caso de uso para garantir consistência.
   def create
     result = UseCases::Estoque::RegistrarAjuste.call(**ajuste_estoque_params.to_h.symbolize_keys)
 
@@ -29,6 +40,8 @@ class Api::V1::AjusteEstoquesController < ApplicationController
   end
 
   # PATCH/PUT /ajuste_estoques/1
+  # @return [void]
+  # @raise [ArgumentError] quando tipo informado é inválido.
   def update
     if @ajuste_estoque.update(ajuste_estoque_params)
       render json: format_ajuste_json(@ajuste_estoque)
@@ -40,6 +53,8 @@ class Api::V1::AjusteEstoquesController < ApplicationController
   end
 
   # DELETE /ajuste_estoques/1
+  # @return [void]
+  # @note Não desfaz movimentos anteriores; apenas remove o registro.
   def destroy
     @ajuste_estoque.destroy!
     render json: { success: true, message: "Ajuste de estoque removido com sucesso" }, status: :ok
