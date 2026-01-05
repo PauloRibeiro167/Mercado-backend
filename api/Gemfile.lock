@@ -94,6 +94,7 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     diff-lcs (1.6.2)
+    docile (1.4.1)
     dotenv (3.1.8)
     dotenv-rails (3.1.8)
       dotenv (= 3.1.8)
@@ -316,6 +317,12 @@ GEM
       rexml
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.13.2)
+    simplecov_json_formatter (0.1.4)
     solid_cache (1.0.8)
       activejob (>= 7.2)
       activerecord (>= 7.2)
@@ -357,6 +364,7 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    yard (0.9.38)
     zeitwerk (2.7.3)
 
 PLATFORMS
@@ -391,11 +399,13 @@ DEPENDENCIES
   rswag-specs
   rswag-ui
   rubocop-rails-omakase
+  simplecov
   solid_cache
   solid_queue
   thruster
   tzinfo-data
   u-case (~> 4.5, >= 4.5.2)
+  yard
 
 BUNDLED WITH
    2.7.0

@@ -45,7 +45,7 @@ gem "bcrypt", "~> 3.1.7"
 # gem "image_processing", "~> 1.2"
 # gem "rack-cors"
 
-group :development do
+group :development, :test do
   # Debugging
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
@@ -66,8 +66,10 @@ group :development do
   gem "rswag-specs"
   gem "rswag-api"
   gem "rswag-ui"
-end
 
-group :test do
-  # Add test-specific gems here if needed
+  # yardocs para documentacao do codigo
+  gem "yard"
+
+  # documentação de testes com coverage
+  gem "simplecov", require: false
 end
