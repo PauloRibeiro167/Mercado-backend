@@ -70,7 +70,18 @@ class Api::V1::CaixasController < ApplicationController
   #
   # @return [ActionController::Parameters]
   def caixa_params
-    params.require(:caixa).permit(:nome, :saldo, :ativo, :usuario_id)
+    params.require(:caixa).permit(
+      :nome,
+      :saldo,
+      :saldo_inicial,
+      :saldo_final,
+      :fundo_abertura,
+      :limite_alerta_minimo,
+      :limite_alerta_maximo,
+      :ativo,
+      :status,
+      :usuario_id
+    )
   end
 
   # Renderiza respostas de erro padronizadas.
@@ -96,7 +107,13 @@ class Api::V1::CaixasController < ApplicationController
       id: caixa.id,
       nome: caixa.nome,
       saldo: caixa.saldo,
+      saldo_inicial: caixa.saldo_inicial,
+      saldo_final: caixa.saldo_final,
+      fundo_abertura: caixa.fundo_abertura,
+      limite_alerta_minimo: caixa.limite_alerta_minimo,
+      limite_alerta_maximo: caixa.limite_alerta_maximo,
       ativo: caixa.ativo,
+      status: caixa.status,
       data_abertura: caixa.data_abertura,
       created_at: caixa.created_at,
       updated_at: caixa.updated_at,
@@ -115,6 +132,19 @@ class Api::V1::CaixasController < ApplicationController
         saidas: caixa.movimentacao_caixas.where(tipo: "saida").sum(:valor),
         suprimentos: caixa.movimentacao_caixas.where(tipo: "suprimento").sum(:valor),
         sangrias: caixa.movimentacao_caixas.where(tipo: "sangria").sum(:valor)
+      },
+      reconciliacoes: {
+        total: caixa.caixa_reconciliacoes.count,
+        ultimo_registro: caixa.caixa_reconciliacoes.order(realizada_em: :desc).limit(1).map do |rec|
+          {
+            id: rec.id,
+            realizada_em: rec.realizada_em,
+            status: rec.status,
+            diferenca: rec.diferenca,
+            usuario_responsavel: rec.usuario_responsavel&.slice(:id, :primeiro_nome, :ultimo_nome),
+            usuario_operador: rec.usuario_operador&.slice(:id, :primeiro_nome, :ultimo_nome)
+          }
+        end.first
       }
     }
   end
