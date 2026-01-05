@@ -18,15 +18,14 @@ class Api::V1::AjusteEstoquesController < ApplicationController
 
   # POST /ajuste_estoques
   def create
-    @ajuste_estoque = AjusteEstoque.new(ajuste_estoque_params)
+    result = UseCases::Estoque::RegistrarAjuste.call(**ajuste_estoque_params.to_h.symbolize_keys)
 
-    if @ajuste_estoque.save
-      render json: format_ajuste_json(@ajuste_estoque), status: :created, location: @ajuste_estoque
+    if result.success?
+      ajuste = result[:ajuste]
+      render json: format_ajuste_json(ajuste), status: :created, location: ajuste
     else
-      render_errors(@ajuste_estoque)
+      render_use_case_failure(result)
     end
-  rescue ArgumentError => e
-    render_invalid_enum(e)
   end
 
   # PATCH/PUT /ajuste_estoques/1
@@ -54,6 +53,31 @@ class Api::V1::AjusteEstoquesController < ApplicationController
 
   def ajuste_estoque_params
     params.require(:ajuste_estoque).permit(:lote_id, :usuario_id, :tipo, :quantidade, :motivo)
+  end
+
+  def render_use_case_failure(result)
+    case result.type
+    when :invalid_attributes
+      render json: { success: false, errors: normalize_errors(result[:errors]) }, status: :unprocessable_entity
+    when :invalid_record
+      render json: { success: false, errors: normalize_errors(result[:errors]) }, status: :unprocessable_entity
+    when :lote_not_found
+      render json: { success: false, errors: [ { campo: :lote_id, mensagem: "Lote não encontrado" } ] }, status: :not_found
+    else
+      render json: { success: false, errors: [ { campo: :base, mensagem: "Erro desconhecido" } ] }, status: :unprocessable_entity
+    end
+  end
+
+  def normalize_errors(errors)
+    return [] if errors.nil?
+
+    errors.map do |err|
+      if err.is_a?(Hash) && err.key?(:campo)
+        err
+      else
+        { campo: :base, mensagem: err.to_s }
+      end
+    end
   end
 
   def render_errors(record)
