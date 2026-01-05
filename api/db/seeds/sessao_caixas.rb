@@ -1,14 +1,15 @@
 require "rainbow"
 
-# Verificar dependências
-usuario = Usuario.first
-gerente = Usuario.second || usuario
-caixa = Caixa.first
 
-unless usuario && caixa
-  puts Rainbow("Erro: Usuário ou caixa não encontrados. Execute as seeds anteriores primeiro.").bold.red
-  exit
-end
+# Verificar se o usuário e caixa existem
+usuario = Usuario.first || Usuario.create!(
+  nome: "Usuário Padrão",
+  email: "seed@example.com",
+  password: "123456",
+  password_confirmation: "123456"
+)
+gerente = Usuario.second || usuario
+caixa = Caixa.first || Caixa.create!(nome: "Caixa Seed", saldo: 0.0, ativo: true, usuario: usuario)
 
 config = {
   table_name: "sessao_caixas",
@@ -20,6 +21,7 @@ config = {
   data: [
     {
       caixa: caixa,
+      usuario: usuario,               # <- adicione se belongs_to :usuario for obrigatório
       usuario_abertura: usuario,
       usuario_fechamento: nil,
       gerente_supervisor: nil,
@@ -36,6 +38,7 @@ config = {
     # Exemplo de sessão fechada
     {
       caixa: caixa,
+      usuario: usuario,               # idem
       usuario_abertura: usuario,
       usuario_fechamento: usuario,
       gerente_supervisor: gerente,
