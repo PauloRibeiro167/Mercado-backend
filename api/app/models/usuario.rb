@@ -18,5 +18,5 @@ class Usuario < ApplicationRecord
   # Relacionamentos (ajuste inverse_of para :usuario)
   has_one :funcionario, inverse_of: :usuario, dependent: :nullify
   has_many :usuario_perfis, class_name: "UsuarioPerfil", dependent: :destroy
-  has_many :perfis, through: :usuario_perfis
+  has_many :perfis, through: :usuario_perfis, source: :perfil
 end
