@@ -1,9 +1,10 @@
 class Perfil < ApplicationRecord
+  # Associação com a tabela de junção entre perfis e usuários
   has_many :usuario_perfis, class_name: "UsuarioPerfil", dependent: :destroy
   has_many :usuarios, through: :usuario_perfis, class_name: "Usuario"
 
+  # Associação com as permissões atribuídas ao perfil
   has_many :perfil_permissoes, class_name: "PerfilPermissao", dependent: :destroy
-  has_many :permissoes, through: :perfil_permissoes
 
   validates :nome,
             presence: { message: "Nome não pode ficar em branco" },
