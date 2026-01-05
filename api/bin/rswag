@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+require 'bundler/setup'
+require 'fileutils'
+require_relative '../config/application'
+
+# Caminho padrão do arquivo Swagger consolidado
+default_path = File.join(__dir__, '../../Docs/swagger.yaml')
+output_file = ARGV[0] || default_path
+
+# Executa a geração das especificações Swagger
+success = Dir.chdir(Rails.root) do
+	system('bundle exec rake rswag:specs:swaggerize')
+end
+
+unless success
+	warn 'Falha ao executar bundle exec rake rswag:specs:swaggerize.'
+	exit 1
+end
+
+# Copia o arquivo gerado para o destino desejado
+generated_file = File.join(Rails.root.to_s, 'swagger', 'v1', 'swagger.yaml')
+
+unless File.exist?(generated_file)
+	warn "Arquivo não encontrado: #{generated_file}. Verifique a configuração em spec/swagger_helper.rb."
+	exit 1
+end
+
+FileUtils.mkdir_p(File.dirname(output_file))
+FileUtils.cp(generated_file, output_file)
+
+puts "Swagger exportado para #{output_file}"
