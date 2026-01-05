@@ -1,9 +1,12 @@
 Rails.application.routes.draw do
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
   # opcional: root redireciona para status da API v1
   root to: redirect("/api/v1/status")
 
   namespace :api do
     namespace :v1 do
+      resources :caixa_reconciliacaos
       get "status", to: "status#index"
 
       post "auth/login",   to: "auth#login"
