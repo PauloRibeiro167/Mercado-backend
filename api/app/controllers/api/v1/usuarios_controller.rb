@@ -1,6 +1,4 @@
-module Api
-  module V1
-    class UsuariosController < ApplicationController
+class Api::V1::UsuariosController < ApplicationController
   before_action :set_usuario, only: %i[ show update destroy ]
   after_action :verify_authorized, except: :index
   after_action :verify_policy_scoped, only: :index
@@ -52,25 +50,22 @@ module Api
 
   private
 
-    def set_usuario
-      @usuario = Usuario.find(params.require(:id))
+  def set_usuario
+    @usuario = Usuario.find(params.require(:id))
+  end
+
+  def usuario_params
+    params.require(:usuario).permit(:nome, :email, :password, :password_confirmation)
+  end
+
+  def render_errors(record)
+    errors = record.errors.map do |error|
+      {
+        campo: error.attribute.to_s,
+        mensagem: error.message
+      }
     end
 
-    def usuario_params
-      params.require(:usuario).permit(:nome, :email, :password, :password_confirmation)
-    end
-
-    def render_errors(record)
-      errors = record.errors.map do |error|
-        {
-          campo: error.attribute.to_s,
-          mensagem: error.message
-        }
-      end
-
-      render json: { success: false, errors: errors }, status: :unprocessable_entity
-    end
-end
-
+    render json: { success: false, errors: errors }, status: :unprocessable_entity
   end
 end
