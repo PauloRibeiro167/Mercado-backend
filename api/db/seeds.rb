@@ -27,6 +27,7 @@ load Rails.root.join('db/seeds/estoque.rb') # CreateEstoques
 load Rails.root.join('db/seeds/caixas.rb') # CreateCaixas
 load Rails.root.join('db/seeds/sessao_caixas.rb') # CreateSessaoCaixas
 load Rails.root.join('db/seeds/movimentacao_caixas.rb') # CreateMovimentacaoCaixas
+load Rails.root.join('db/seeds/caixa_reconciliacoes.rb') # CreateCaixaReconciliacoes
 load Rails.root.join('db/seeds/metodo_pagamentos.rb') # CreateMetodoPagamentos
 load Rails.root.join('db/seeds/vendas.rb') # CreateVendas
 load Rails.root.join('db/seeds/item_vendas.rb') # CreateItemVendas
