@@ -21,6 +21,7 @@ services:
     ports:
       - "${BACKEND_PORT}:3000"
       - "3001:3001"
+      - 8808:8808
     depends_on:
       - postgres
 
