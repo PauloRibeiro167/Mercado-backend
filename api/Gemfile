@@ -16,6 +16,9 @@ gem "rolify", "~> 6.0"
 gem "pundit", "~> 2.5", ">= 2.5.2"
 gem "jwt", "~> 2.8"
 
+# Gem para criação de casos de uso (use cases) na aplicação
+gem "u-case", "~> 4.5", ">= 4.5.2"
+
 # user
 # gem "devise", "~> 4.9"
 
@@ -57,6 +60,12 @@ group :development do
 
   # ER Diagram generation
   gem "rails-erd"
+
+  # Documentação de api e requirido para a gem rswag
+  gem "rspec-rails"
+  gem "rswag-specs"
+  gem "rswag-api"
+  gem "rswag-ui"
 end
 
 group :test do
