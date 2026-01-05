@@ -1,6 +1,4 @@
-module Api
-  module V1
-    class VendasController < ApplicationController
+class Api::V1::VendasController < ApplicationController
   before_action :set_venda, only: %i[ show update destroy ]
 
   rescue_from ActiveRecord::RecordNotFound do
@@ -46,25 +44,22 @@ module Api
 
   private
 
-    def set_venda
-      @venda = Venda.find(params.require(:id))
+  def set_venda
+    @venda = Venda.find(params.require(:id))
+  end
+
+  def venda_params
+    params.require(:venda).permit(:status, :subtotal, :valor_taxa, :metodo_pagamento_id, :data_venda)
+  end
+
+  def render_errors(record)
+    errors = record.errors.map do |error|
+      {
+        campo: error.attribute.to_s,
+        mensagem: error.message
+      }
     end
 
-    def venda_params
-      params.require(:venda).permit(:status, :subtotal, :valor_taxa, :metodo_pagamento_id, :data_venda)
-    end
-
-    def render_errors(record)
-      errors = record.errors.map do |error|
-        {
-          campo: error.attribute.to_s,
-          mensagem: error.message
-        }
-      end
-
-      render json: { success: false, errors: errors }, status: :unprocessable_entity
-    end
-end
-
+    render json: { success: false, errors: errors }, status: :unprocessable_entity
   end
 end
