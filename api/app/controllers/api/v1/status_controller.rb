@@ -1,6 +1,4 @@
-module Api
-  module V1
-    class StatusController < ApplicationController
+class Api::V1::StatusController < ApplicationController
   skip_before_action :authenticate_user!, only: :index
 
   def index
@@ -14,8 +12,5 @@ module Api
       documentation_url: metadata[:documentation_url],
       support_contact: metadata[:support_contact]
     }
-  end
-end
-
   end
 end
