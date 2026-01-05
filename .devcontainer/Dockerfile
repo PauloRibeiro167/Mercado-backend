@@ -1,13 +1,20 @@
 FROM ruby:3.4.5-slim
 
+# =============================================================================
+# Configurações iniciais do ambiente
+# =============================================================================
+
 # Configura o frontend do debconf para não interativo, evitando prompts durante o build
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Usa apenas desativação de traduções do APT para acelerar
+# Desabilita traduções do APT para acelerar as instalações
 RUN echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99disable-translations
 
-# Atualiza e instala dependências
-# Instala dependências básicas para Rails
+# =============================================================================
+# Instalar dependências do sistema
+# =============================================================================
+
+# Instala dependências básicas para Rails e desenvolvimento
 RUN apt-get update && \
   apt-get install -y --no-install-recommends --no-install-suggests \
   build-essential \
@@ -25,63 +32,81 @@ RUN apt-get update && \
   locales \
   graphviz \
   gosu \
+  net-tools \
+  lsof \
   && echo "pt_BR.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen pt_BR.UTF-8 \
-  && apt-get install -y --no-install-recommends net-tools lsof \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# =============================================================================
+# Configurar locale e variáveis de ambiente
+# =============================================================================
 
 ENV LANG=pt_BR.UTF-8
 ENV LANGUAGE=pt_BR:pt
 ENV LC_ALL=pt_BR.UTF-8
 
+# =============================================================================
+# Instalar Bundler para gerenciamento de gems
+# =============================================================================
 
-
-# Instala bundler
 RUN gem install bundler
 
-# Instalar dependências do backend Rails
+# =============================================================================
+# Preparar projeto e instalar dependências Ruby
+# =============================================================================
+
+# Criar diretório do projeto
 RUN mkdir -p /workspaces/backend
-COPY api/Gemfile api/Gemfile.lock /workspaces/backend/
-RUN cd /workspaces/backend && bundle install
 
+# Definir diretório de trabalho
+WORKDIR /workspaces/backend
 
+# Copiar arquivos de dependências
+COPY api/Gemfile api/Gemfile.lock ./
 
-# Configura o PATH
+# Instalar dependências do projeto
+RUN bundle install
+
+# =============================================================================
+# Configurar PATH para incluir binários das gems
+# =============================================================================
+
 ENV PATH="/usr/local/bundle/bin:${PATH}"
 
+# =============================================================================
+# Configurar usuário não-root para desenvolvimento
+# =============================================================================
 
-
-
-
-
-
-# Build-time args: permitem criar usuário na imagem durante o build (opcional)
+# Argumentos de build para UID/GID do usuário
 ARG LOCAL_UID=1000
 ARG LOCAL_GID=1000
 
-# Criar usuário não-root para possíveis operações (usuário padrão durante build)
-# Se já existir um usuário/grupo com os mesmos IDs, usa-os; caso contrário cria.
+# Criar usuário não-root se não existir
 RUN \
   EXISTING_GROUP=$(getent group | awk -F: -v gid="$LOCAL_GID" '$3==gid{print $1}'); \
-  if [ -z "$EXISTING_GROUP" ]; then groupadd -g "$LOCAL_GID" devgroup; else echo "group $EXISTING_GROUP exists for GID $LOCAL_GID"; fi; \
+  if [ -z "$EXISTING_GROUP" ]; then groupadd -g "$LOCAL_GID" devgroup; else echo "Grupo $EXISTING_GROUP já existe para GID $LOCAL_GID"; fi; \
   EXISTING_USER=$(getent passwd | awk -F: -v uid="$LOCAL_UID" '$3==uid{print $1}'); \
-  if [ -z "$EXISTING_USER" ]; then useradd -m -u "$LOCAL_UID" -g "$LOCAL_GID" -s /bin/bash dev || true; else echo "user $EXISTING_USER exists for UID $LOCAL_UID"; fi
+  if [ -z "$EXISTING_USER" ]; then useradd -m -u "$LOCAL_UID" -g "$LOCAL_GID" -s /bin/bash dev || true; else echo "Usuário $EXISTING_USER já existe para UID $LOCAL_UID"; fi
 
+# =============================================================================
+# Configurar entrypoint
+# =============================================================================
 
-
-# Copiar entrypoint que criará um usuário em tempo de execução com o UID/GID do host
+# Copiar script de entrypoint que cria usuário em tempo de execução
 COPY .devcontainer/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# =============================================================================
+# Expor portas da aplicação
+# =============================================================================
 
+EXPOSE 3000 3001
 
+# =============================================================================
+# Comando de execução
+# =============================================================================
 
-
-EXPOSE 3000
-EXPOSE 3001
-
-WORKDIR /workspaces/backend
-
-# Entry point: cria usuário com UID/GID do host (se fornecido via env) e executa o comando como esse usuário
+# Entry point: cria usuário com UID/GID do host e executa o comando
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["rails", "server", "-b", "0.0.0.0"]
+CMD ["bin/dev"]
