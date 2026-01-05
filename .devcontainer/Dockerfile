@@ -23,6 +23,7 @@ RUN apt-get update && \
   git \
   curl \
   locales \
+  graphviz \
   gosu \
   && echo "pt_BR.UTF-8 UTF-8" >> /etc/locale.gen \
   && locale-gen pt_BR.UTF-8 \
