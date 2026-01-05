@@ -7,6 +7,19 @@
 # Ignorar configuração do Bundler.
 api/.bundle
 
+# Ignorar configurações da gem YARD
+api/.yardoc
+api/doc/
+
+# Ignorar arquivos de dependências do Node.js.
+api/node_modules/
+
+# Ignorar arquivos do kamal.
+api/.kamal/
+
+# Ignorar arquivos do .github.
+api/.github/
+
 # Ignorar todos os arquivos de ambiente.
 /.env*
 
