@@ -24,8 +24,8 @@ api/.github/
 /.env*
 
 # Ignorar todos os arquivos de log e temporários.
-api/log/*
-api/tmp/*
+api/log/
+api/tmp/
 !api/log/.keep
 !api/tmp/.keep
 
