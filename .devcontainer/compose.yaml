@@ -19,9 +19,9 @@ services:
     environment:
       - SERVICE_TYPE=backend
     ports:
-      - "${BACKEND_PORT}:3000"
-      - "3001:3001"
-      - 8808:8808
+      - ${BACKEND_PORT_1}
+      - ${BACKEND_PORT_2}
+      - ${BACKEND_PORT_3}
     depends_on:
       - postgres
 
@@ -33,7 +33,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "${DB_PORT}:5432"
+      - ${DB_PORT_MAPPING}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
