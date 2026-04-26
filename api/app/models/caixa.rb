@@ -25,7 +25,7 @@ class Caixa < ApplicationRecord
   has_many :movimentacao_caixas
   has_many :caixa_reconciliacoes
 
-  enum status: { operacional: "operacional", bloqueado: "bloqueado", encerrado: "encerrado" }, _prefix: true
+  enum :status, operacional: "operacional", bloqueado: "bloqueado", encerrado: "encerrado"
 
   # Validações
   validates :nome,
