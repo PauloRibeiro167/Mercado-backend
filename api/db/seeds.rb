@@ -21,6 +21,7 @@ load Rails.root.join('db/seeds/item_pedido_compras.rb') # CreateItemPedidoCompra
 load Rails.root.join('db/seeds/promocaos.rb') # CreatePromocaos
 load Rails.root.join('db/seeds/metodo_pagamentos.rb') # CreateMetodoPagamentos
 load Rails.root.join('db/seeds/conta_pagars.rb') # CreateContaPagars
+load Rails.root.join('db/seeds/parcelas_contas_pagar.rb') # CreateParcelasContaPagars
 load Rails.root.join('db/seeds/conta_recebers.rb') # CreateContaRecebers
 load Rails.root.join('db/seeds/pagamentos.rb') # CreatePagamentos
 load Rails.root.join('db/seeds/estoque.rb') # CreateEstoques
