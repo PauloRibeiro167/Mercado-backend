@@ -43,11 +43,16 @@ module MercadoBackend
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    config.autoload_paths += %W(#{config.root}/app)
-    config.autoload_paths += %W(#{config.root}/app/models)
-    config.autoload_paths << Rails.root.join('app', 'use_cases')
+    # Ativa a seleção automática de banco de dados (Primary vs Replica)
+    config.active_record.database_selector = { delay: 2.seconds }
+    config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
+    config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
+
+    config.autoload_paths += %W[#{config.root}/app]
+    config.autoload_paths += %W[#{config.root}/app/models]
+    config.autoload_paths << Rails.root.join("app", "use_cases")
     config.eager_load_paths << Rails.root.join("app")
-    config.eager_load_paths << Rails.root.join('app', 'use_cases')
-    config.autoload_paths -= Dir[Rails.root.join('vendor', 'gems', 'devise-*/app/mailers')]
+    config.eager_load_paths << Rails.root.join("app", "use_cases")
+    config.autoload_paths -= Dir[Rails.root.join("vendor", "gems", "devise-*/app/mailers")]
   end
 end
