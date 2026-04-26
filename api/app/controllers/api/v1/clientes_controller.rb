@@ -4,8 +4,8 @@
 # listar, criar, visualizar, atualizar e excluir clientes. Inclui validações
 # de CPF, email e telefone, e tratamento de erros para registros não encontrados.
 #
-# @author [Nome do Autor]
-# @since [Versão ou Data]
+# @author [Paulo Ribeiro]
+# @since [01-alfa-2026]
 class Api::V1::ClientesController < ApplicationController
   before_action :set_cliente, only: %i[ show update destroy ]
 
@@ -45,7 +45,6 @@ class Api::V1::ClientesController < ApplicationController
   #
   # @return [JSON] um objeto JSON com os detalhes do cliente criado (status 201)
   # @return [JSON] erro 422 se houver erros de validação
-  # @raise [ArgumentError] se houver enum inválido (não aplicável aqui)
   # @example
   #   POST /api/v1/clientes
   #   {
@@ -75,7 +74,6 @@ class Api::V1::ClientesController < ApplicationController
   # @return [JSON] um objeto JSON com os detalhes atualizados do cliente
   # @return [JSON] erro 422 se houver erros de validação
   # @return [JSON] erro 404 se o cliente não for encontrado
-  # @raise [ArgumentError] se houver enum inválido (não aplicável aqui)
   # @example
   #   PATCH /api/v1/clientes/1
   #   {
