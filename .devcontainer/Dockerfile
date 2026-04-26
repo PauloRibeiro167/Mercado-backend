@@ -68,6 +68,12 @@ COPY api/Gemfile api/Gemfile.lock ./
 # Instalar dependências do projeto
 RUN bundle install
 
+# Atualizar dependências das gems
+RUN gem update
+
+# Instalar o YARD para documentação
+RUN bundle exec gem install yard
+
 # =============================================================================
 # Configurar PATH para incluir binários das gems
 # =============================================================================
