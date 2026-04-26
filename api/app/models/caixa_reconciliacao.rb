@@ -49,15 +49,8 @@ class CaixaReconciliacao < ApplicationRecord
   self.table_name = "caixa_reconciliacoes"
 
   # Enumera estados e motivos para facilitar filtros de auditoria.
-  enum status: { pendente: "pendente", aprovado: "aprovado", rejeitado: "rejeitado" }, _prefix: true
-  enum motivo: {
-    divergencia_contagem: "divergencia_contagem",
-    deposito_nao_registrado: "deposito_nao_registrado",
-    sangria_nao_registrada: "sangria_nao_registrada",
-    suprimento_nao_registrado: "suprimento_nao_registrado",
-    ajuste_manual: "ajuste_manual",
-    outros: "outros"
-  }, _prefix: true
+  enum :status, pendente: "pendente", aprovado: "aprovado", rejeitado: "rejeitado"
+  enum :motivo, divergencia_contagem: "divergencia_contagem", deposito_nao_registrado: "deposito_nao_registrado", sangria_nao_registrada: "sangria_nao_registrada", suprimento_nao_registrado: "suprimento_nao_registrado", ajuste_manual: "ajuste_manual", outros: "outros"
 
   belongs_to :caixa
   belongs_to :usuario_responsavel, class_name: "Usuario"
