@@ -25,11 +25,9 @@ config = {
       usuario: usuario,
       categoria: categoria,
       numero_documento: 'DOC001',
-      valor_original: 1500.50,
       descricao: 'Pagamento de mercadorias',
       valor: 1500.50,
       data_vencimento: Date.today + 30,
-      data_pagamento: nil,
       status: 'pendente',
       tipo_conta: 'fornecedor'
     },
@@ -40,11 +38,9 @@ config = {
       usuario: usuario,
       categoria: categoria,
       numero_documento: 'DOC002',
-      valor_original: 2500.00,
       descricao: 'Compra de equipamentos',
       valor: 2500.00,
       data_vencimento: Date.today + 15,
-      data_pagamento: Date.today,
       status: 'pago',
       tipo_conta: 'fornecedor'
     }
