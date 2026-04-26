@@ -5,15 +5,16 @@
 # (a obrigatoriedade deve ser validada separadamente com presence: true no model).
 #
 # @example Uso em um model:
-#   validates :cpf, presence: true
-#   validate do
-#     validator = CpfValidator.new
-#     validator.validate(self)
+#   class Cliente < ApplicationRecord
+#     validates :cpf, presence: true
+#     validates_with CpfValidator
 #   end
 class CpfValidator < ActiveModel::Validator
-  # Método de validação chamado para verificar o CPF do registro
-  # @param record [ActiveRecord::Base] o registro sendo validado (deve ter atributo cpf)
-  # @return [void] adiciona erro ao record se CPF inválido
+  # Método de validação chamado para verificar o CPF do registro.
+  #
+  # @param record [ActiveRecord::Base] O registro sendo validado (deve ter atributo cpf)
+  # @return [void] Adiciona erro ao record se CPF inválido
+  # @note Permite CPF em branco; use validates :cpf, presence: true para obrigatoriedade
   def validate(record)
     return if record.cpf.blank?
 
@@ -24,9 +25,11 @@ class CpfValidator < ActiveModel::Validator
 
   private
 
-  # Método auxiliar para validação completa do CPF
-  # @param cpf [String] o CPF a ser validado (pode incluir formatação)
-  # @return [Boolean] true se CPF válido
+  # Método auxiliar para validação completa do CPF.
+  #
+  # @param cpf [String] O CPF a ser validado (pode incluir formatação)
+  # @return [Boolean] true se CPF válido, false caso contrário
+  # @note Remove caracteres não numéricos e verifica dígitos verificadores
   def valid_cpf?(cpf)
     # Remove caracteres não numéricos
     clean_cpf = cpf.gsub(/\D/, "")
