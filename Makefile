@@ -109,7 +109,7 @@ exec-backend:
 		printf "$(RED)Não foi possível detectar o diretório do backend dentro do container.$(NC)\n"; \
 		exit 1; \
 	fi; \
-	$(DOCKER) exec -e PROJECT_NAME="$(PROJECT_NAME)" -e CONTAINER_ID="$$container_id" -it $(APP_SERVICE_BACKEND) bash -lc 'cd "$$detected_dir"; export PS1="\[\e[1;34m\]${PROJECT_NAME}-backend:\w:\[\e[0m\] "; exec bash --noprofile --norc' || true
+	$(DOCKER) exec -w "$$detected_dir" -e PROJECT_NAME="$(PROJECT_NAME)" -e CONTAINER_ID="$$container_id" -e "PS1=\[\e[1;34m\]$(PROJECT_NAME)-backend:\w:\[\e[0m\] " -it $(APP_SERVICE_BACKEND) bash -il || true
 
 logs:
 	@container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_BACKEND) 2>/dev/null) || true; \
