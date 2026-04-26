@@ -24,10 +24,14 @@ services:
       - "${BACKEND_PORT:-3000}:3000"
     depends_on:
       - postgres
+      - postgres-primary
+      - redis
 
   postgres:
+  postgres-primary:
     image: postgres:17.6
     container_name: ${CONTAINER_NAME_DB}
+    container_name: ${CONTAINER_NAME_DB}_primary
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -36,6 +40,33 @@ services:
       - "${DB_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - pgdata_primary:/var/lib/postgresql/data
+
+  postgres-replica:
+    image: postgres:17.6
+    container_name: ${CONTAINER_NAME_DB}_replica
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_replica:/var/lib/postgresql/data
+    depends_on:
+      - postgres-primary
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: ${PROJECT_NAME}_redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
 
 volumes:
   pgdata:
+  pgdata_primary:
+  pgdata_replica:
+  redisdata:
