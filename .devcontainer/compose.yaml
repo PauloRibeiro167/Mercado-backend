@@ -23,14 +23,11 @@ services:
     ports:
       - "${BACKEND_PORT:-3000}:3000"
     depends_on:
-      - postgres
       - postgres-primary
       - redis
 
-  postgres:
   postgres-primary:
     image: postgres:17.6
-    container_name: ${CONTAINER_NAME_DB}
     container_name: ${CONTAINER_NAME_DB}_primary
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -39,8 +36,8 @@ services:
     ports:
       - "${DB_PORT:-5432}:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
       - pgdata_primary:/var/lib/postgresql/data
+      - ./db_setup/setup-primary.sh:/docker-entrypoint-initdb.d/setup-primary.sh:ro
 
   postgres-replica:
     image: postgres:17.6
@@ -53,6 +50,9 @@ services:
       - "5433:5432"
     volumes:
       - pgdata_replica:/var/lib/postgresql/data
+      - ./db_setup/replica-entrypoint.sh:/usr/local/bin/replica-entrypoint.sh:ro
+    entrypoint: ["bash", "/usr/local/bin/replica-entrypoint.sh"]
+    command: ["postgres"]
     depends_on:
       - postgres-primary
 
@@ -66,7 +66,6 @@ services:
       - redisdata:/data
 
 volumes:
-  pgdata:
   pgdata_primary:
   pgdata_replica:
   redisdata:
