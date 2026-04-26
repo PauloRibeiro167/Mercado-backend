@@ -2,10 +2,10 @@
 
 # Caso de uso responsável por registrar ajustes de estoque com consistência transacional.
 # @example Ajuste de entrada
-#   UseCases::Estoque::RegistrarAjuste.call!(
+#   Estoque::RegistrarAjuste.call!(
 #     lote_id: 1, usuario_id: 42, tipo: :entrada, quantidade: 5, motivo: "Reposição"
 #   )
-class UseCases::Estoque::RegistrarAjuste < Micro::Case
+class Estoque::RegistrarAjuste < Micro::Case
   include ActiveModel::Validations
 
   # @!attribute lote_id
