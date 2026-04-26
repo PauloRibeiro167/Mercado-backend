@@ -18,7 +18,6 @@ class CreateCaixaReconciliacoes < ActiveRecord::Migration[8.0]
     add_index :caixa_reconciliacoes, :realizada_em, comment: "Facilita consultas por período de reconciliação"
     add_index :caixa_reconciliacoes, :status
     add_index :caixa_reconciliacoes, [ :caixa_id, :realizada_em ], name: "index_reconciliacoes_on_caixa_and_realizada_em"
-    add_index :caixa_reconciliacoes, :sessao_caixa_id
 
     add_check_constraint :caixa_reconciliacoes, "saldo_registrado >= 0", name: "saldo_registrado_nao_negativo"
     add_check_constraint :caixa_reconciliacoes, "saldo_fisico >= 0", name: "saldo_fisico_nao_negativo"
