@@ -2,25 +2,48 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD") { "" } %>
 
 development:
-  <<: *default
-  database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>
-  username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
-  password: <%= ENV.fetch("POSTGRES_PASSWORD") { "" } %>
-  host: postgres
-  port: 5432
+  primary:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>
+    host: postgres-primary
+    port: 5432
+  primary_replica:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>
+    host: postgres-replica
+    port: 5432
+    replica: true
 
 test:
-  <<: *default
-  database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>_test
-  username: <%= ENV.fetch("POSTGRES_USER") { "postgres" } %>
-  password: <%= ENV.fetch("POSTGRES_PASSWORD") { "" } %>
-  host: postgres
-  port: 5432
+  primary:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>_test
+    host: postgres-primary
+    port: 5432
+  primary_replica:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>_test
+    host: postgres-replica
+    port: 5432
+    replica: true
 
 production:
-  <<: *default
-  database: mercado_backend_production
-  username: mercado_backend
-  password: <%= ENV["MERCADO_BACKEND_DATABASE_PASSWORD"] %>
+  primary:
+    <<: *default
+    database: mercado_backend_production
+    username: mercado_backend
+    password: <%= ENV["MERCADO_BACKEND_DATABASE_PASSWORD"] %>
+    host: postgres-primary
+    port: 5432
+  primary_replica:
+    <<: *default
+    database: mercado_backend_production
+    username: mercado_backend
+    password: <%= ENV["MERCADO_BACKEND_DATABASE_PASSWORD"] %>
+    host: postgres-replica
+    port: 5432
+    replica: true
