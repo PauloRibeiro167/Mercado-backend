@@ -8,6 +8,7 @@ services:
         PULL: true
     container_name: ${CONTAINER_NAME_BACKEND}
     image: ${PROJECT_NAME}_backend:latest
+    pull_policy: build
     entrypoint: ["bash", "/usr/local/bin/entrypoint.sh"]
     volumes:
       - ..:/workspaces:cached
@@ -18,10 +19,9 @@ services:
       - ../.env.development
     environment:
       - SERVICE_TYPE=backend
+      - BINDING=0.0.0.0
     ports:
-      - ${BACKEND_PORT_1}
-      - ${BACKEND_PORT_2}
-      - ${BACKEND_PORT_3}
+      - "${BACKEND_PORT:-3000}:3000"
     depends_on:
       - postgres
 
@@ -33,7 +33,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - ${DB_PORT_MAPPING}
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
