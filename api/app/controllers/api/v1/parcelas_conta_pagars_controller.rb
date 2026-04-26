@@ -1,4 +1,4 @@
-class ParcelasContaPagarsController < ApplicationController
+class Api::V1::ParcelasContaPagarsController < ApplicationController
   before_action :set_parcelas_conta_pagar, only: %i[ show update destroy ]
 
   # Retorna a lista de todas as parcelas de contas a pagar
