@@ -1,4 +1,16 @@
 class Admin::TiposContrato < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("tipos_contratos_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
   self.table_name = "tipos_contratos"
 
   has_many :funcionarios
