@@ -1,5 +1,17 @@
 module Estoque
   class Fornecedor < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("fornecedors_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
   include Discard::Model
 
     belongs_to :usuario, class_name: "Admin::Usuario"
