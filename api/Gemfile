@@ -49,6 +49,9 @@ gem "bcrypt", "~> 3.1.7"
 # gem "image_processing", "~> 1.2"
 # gem "rack-cors"
 
+# gem para acesso administrativo a aplicação
+gem "activeadmin", "4.0.0.beta22"
+
 group :development, :test do
   # Debugging
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
