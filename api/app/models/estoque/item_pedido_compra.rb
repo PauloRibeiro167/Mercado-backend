@@ -1,5 +1,17 @@
 module Estoque
   class ItemPedidoCompra < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("item_pedido_compras_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
     belongs_to :pedido_compra
     belongs_to :produto
 
