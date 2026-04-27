@@ -9,8 +9,30 @@ class Api::V1::Admin::UsuariosController < ApplicationController
 
   # GET /usuarios
   def index
-    @usuarios = policy_scope(Admin::Usuario)
-    render json: @usuarios
+    ultimo_atualizado = policy_scope(Admin::Usuario).maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @usuarios = policy_scope(Admin::Usuario)
+      render json: @usuarios
+    end
+  end
+
+  # GET /usuarios/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @usuarios_alterados = policy_scope(Admin::Usuario).where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @usuarios_alterados
+    }
   end
 
   # GET /usuarios/1
