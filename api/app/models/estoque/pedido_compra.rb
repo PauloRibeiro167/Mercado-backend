@@ -3,6 +3,20 @@ module Estoque
 
   # model de pedido de compra
   class PedidoCompra < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("pedido_compras_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
+  include Discard::Model
+
     belongs_to :fornecedor
     belongs_to :usuario, class_name: 'Admin::Usuario'
     has_many :pagamentos, foreign_key: :pedido_compras_id
@@ -70,5 +84,4 @@ module Estoque
     def rejeitar
       update(status: :pendente_de_aprovacao)
     end
-  end
-end
+  endend
