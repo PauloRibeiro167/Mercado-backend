@@ -53,8 +53,8 @@ module Financeiro
     enum :status, pendente: "pendente", aprovado: "aprovado", rejeitado: "rejeitado"
     enum :motivo, divergencia_contagem: "divergencia_contagem", deposito_nao_registrado: "deposito_nao_registrado", sangria_nao_registrada: "sangria_nao_registrada", suprimento_nao_registrado: "suprimento_nao_registrado", ajuste_manual: "ajuste_manual", outros: "outros"
 
-    belongs_to :caixa
-    belongs_to :usuario_responsavel, class_name: "Usuario"
+    belongs_to :caixa, class_name: 'Pdv::Caixa'
+    belongs_to :usuario_responsavel, class_name: "Admin::Usuario"
     belongs_to :sessao_caixa
 
     delegate :usuario, to: :sessao_caixa, prefix: true, allow_nil: true

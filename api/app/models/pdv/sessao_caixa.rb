@@ -1,12 +1,12 @@
 module Pdv
   class SessaoCaixa < ApplicationRecord
     # Associações
-    belongs_to :usuario
+    belongs_to :usuario, class_name: 'Admin::Usuario'
 
     belongs_to :caixa
-    belongs_to :usuario_abertura, class_name: "Usuario"
-    belongs_to :usuario_fechamento, class_name: "Usuario", optional: true
-    belongs_to :gerente_supervisor, class_name: "Usuario", optional: true
+    belongs_to :usuario_abertura, class_name: "Admin::Usuario"
+    belongs_to :usuario_fechamento, class_name: "Admin::Usuario", optional: true
+    belongs_to :gerente_supervisor, class_name: "Admin::Usuario", optional: true
     has_many :vendas
     has_many :movimentacao_caixas, as: :origem
 

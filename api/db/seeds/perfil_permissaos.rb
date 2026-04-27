@@ -1,14 +1,14 @@
 require "rainbow"
 
 # Verificar dependências
-unless Perfil.exists? && Permissao.exists?
+unless Admin::Perfil.exists? && Admin::Permissao.exists?
   puts Rainbow("Erro: Perfis ou permissões não encontrados. Execute as seeds de perfils e permissaos primeiro.").bold.red
   exit
 end
 
 config = {
   table_name: "perfil_permissaos",
-  model_class: PerfilPermissao,
+  model_class: Admin::PerfilPermissao,
   singular: "perfil_permissao",
   plural: "perfil_permissaos",
   recriar_env_var: "RECRIAR_PERFIL_PERMISSAOS",
@@ -59,7 +59,7 @@ begin
     total_antes = config[:model_class].count
 
     config[:data].each do |record_attrs|
-      perfil = Perfil.find_by(nome: record_attrs[:perfil_nome])
+      perfil = Admin::Perfil.find_by(nome: record_attrs[:perfil_nome])
       unless perfil
         erros_ao_criar << { perfil: record_attrs[:perfil_nome], erro: "Perfil não encontrado" }
         next
@@ -67,7 +67,7 @@ begin
 
       record_attrs[:permissao_nomes].each do |permissao_nome|
         begin
-          permissao = Permissao.find_by(nome: permissao_nome)
+          permissao = Admin::Permissao.find_by(nome: permissao_nome)
           unless permissao
             erros_ao_criar << { permissao: permissao_nome, erro: "Permissão não encontrada" }
             next

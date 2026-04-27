@@ -7,11 +7,11 @@ class ApplicationController < ActionController::API
   def current_user
     @current_user ||= begin
       if session[:user_id]
-        Usuario.find(session[:user_id])
+        Admin::Usuario.find_by(id: session[:user_id])
       elsif request.headers["Authorization"].present?
         token = request.headers["Authorization"].split(" ").last
         decoded = decode_token(token)
-        Usuario.find(decoded["user_id"]) if decoded
+        Admin::Usuario.find_by(id: decoded["user_id"]) if decoded
       end
     end
   end
@@ -59,11 +59,24 @@ class ApplicationController < ActionController::API
   rescue_from ActionController::RoutingError, with: :route_not_found
   rescue_from ActionController::UnknownHttpMethod, with: :method_not_allowed
 
-  def route_not_found
-    render json: { error: "Rota não encontrada ou método não permitido." }, status: :not_found
+  # Tratamento de erros do Pundit
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  rescue_from Pundit::NotDefinedError, with: :policy_not_defined
+
+  protected
+
+  def user_not_authorized(exception)
+    policy_name = exception.policy.class.to_s.underscore
+    Rails.logger.warn("NotAuthorizedError: Usuário não tem permissão para esta ação (#{policy_name}.#{exception.query})")
+    render json: { success: false, error: "Você não tem permissão para realizar esta ação." }, status: :forbidden
   end
 
-  def method_not_allowed
-    render json: { error: "Método HTTP não permitido para este endpoint." }, status: :method_not_allowed
+  def policy_not_defined(exception)
+    Rails.logger.error("Pundit::NotDefinedError: #{exception.message}")
+    render json: { 
+      success: false, 
+      error: "Erro de configuração de permissões.",
+      detalhes: Rails.env.development? ? exception.message : "Contate o suporte."
+    }, status: :not_implemented
   end
 end

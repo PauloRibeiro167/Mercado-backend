@@ -2,7 +2,7 @@ require 'rainbow'
 
 config = {
   table_name: "metodo_pagamentos",
-  model_class: MetodoPagamento,
+  model_class: Financeiro::MetodoPagamento,
   singular: "metodo_pagamento",
   plural: "metodo_pagamentos",
   recriar_env_var: "RECRIAR_METODO_PAGAMENTOS",

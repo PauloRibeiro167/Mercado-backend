@@ -54,18 +54,18 @@ categorias.each { |c| c[:taxa_de_lucro] = taxas_ficticias.next }
 begin
   ActiveRecord::Base.transaction do
     if RECRIAR_CATEGORIAS
-      Categoria.where(nome: categorias.map { |i| i[:nome] }).destroy_all
+      Estoque::Categoria.where(nome: categorias.map { |i| i[:nome] }).destroy_all
       puts Rainbow("Categorias existentes deletadas para recriação").bold.yellow
     end
 
     categorias_criados = 0
     categorias_atualizados = 0
     erros_ao_criar = []
-    total_antes = Categoria.count
+    total_antes = Estoque::Categoria.count
 
     categorias.each do |categorias_attrs|
       begin
-        record = Categoria.find_or_initialize_by(nome: categorias_attrs[:nome])
+        record = Estoque::Categoria.find_or_initialize_by(nome: categorias_attrs[:nome])
         record.assign_attributes(categorias_attrs)
 
         if record.new_record?
@@ -81,7 +81,7 @@ begin
       end
     end
 
-    itens_criados = Categoria.count - total_antes
+    itens_criados = Estoque::Categoria.count - total_antes
 
     if itens_criados == 0 && categorias_atualizados == 0
       puts Rainbow("\nNenhuma categoria nova criada, pois todas já existem").bold.yellow

@@ -1,8 +1,8 @@
 require "rainbow"
 
-pedido_compra1 = PedidoCompra.find_by(codigo: "PC001")
-pedido_compra2 = PedidoCompra.find_by(codigo: "PC002")
-usuario = Usuario.first
+pedido_compra1 = Estoque::PedidoCompra.find_by(codigo: "PC001")
+pedido_compra2 = Estoque::PedidoCompra.find_by(codigo: "PC002")
+usuario = Admin::Usuario.first
 
 unless pedido_compra1 && pedido_compra2 && usuario
   puts Rainbow("Erro: Pedidos de compra ou usuário não encontrados. Execute as seeds anteriores primeiro.").bold.red
@@ -11,7 +11,7 @@ end
 
 config = {
   table_name: "pagamentos",
-  model_class: Pagamento,
+  model_class: Financeiro::Pagamento,
   singular: "pagamento",
   plural: "pagamentos",
   recriar_env_var: "RECRIAR_PAGAMENTOS",

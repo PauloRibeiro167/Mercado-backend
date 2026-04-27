@@ -1,9 +1,9 @@
 require "rainbow"
 
 # Verificar dependências
-usuario = Usuario.first
-caixa = Caixa.first
-sessao_caixa = SessaoCaixa.first
+usuario = Admin::Usuario.first
+caixa = Pdv::Caixa.first
+sessao_caixa = Pdv::SessaoCaixa.first
 
 unless usuario && caixa && sessao_caixa
   puts Rainbow("Erro: Usuário, caixa ou sessão de caixa não encontrados. Execute as seeds anteriores primeiro.").bold.red
@@ -12,7 +12,7 @@ end
 
 config = {
   table_name: "movimentacao_caixas",
-  model_class: MovimentacaoCaixa,
+  model_class: Pdv::MovimentacaoCaixa,
   singular: "movimentacao_caixa",
   plural: "movimentacao_caixas",
   recriar_env_var: "RECRIAR_MOVIMENTACAO_CAIXAS",

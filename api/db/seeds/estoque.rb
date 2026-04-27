@@ -1,8 +1,8 @@
 require "rainbow"
 
 # Encontrar produtos e lotes existentes
-produtos = Produto.where(nome: [ "Maçã Gala", "Banana Prata", "Laranja Bahia", "Alface Crespa" ])
-lotes = Lote.where(codigo: [ "LOTE001", "LOTE002" ])
+produtos = Estoque::Produto.where(nome: [ "Maçã Gala", "Banana Prata", "Laranja Bahia", "Alface Crespa" ])
+lotes = Estoque::Lote.where(codigo: [ "LOTE001", "LOTE002" ])
 
 unless produtos.count == 4 && lotes.count == 2
   puts Rainbow("Erro: Produtos ou lotes não encontrados. Execute as seeds de produtos e lotes primeiro.").bold.red
@@ -62,8 +62,8 @@ begin
 
     config[:data].each do |record_attrs|
       begin
-        produto = Produto.find_by(nome: record_attrs[:produto_nome])
-        lote = record_attrs[:lote_codigo] ? Lote.find_by(codigo: record_attrs[:lote_codigo]) : nil
+        produto = Estoque::Produto.find_by(nome: record_attrs[:produto_nome])
+        lote = record_attrs[:lote_codigo] ? Estoque::Lote.find_by(codigo: record_attrs[:lote_codigo]) : nil
 
         if produto.nil?
           puts Rainbow("Produto '#{record_attrs[:produto_nome]}' não encontrado.").bold.yellow

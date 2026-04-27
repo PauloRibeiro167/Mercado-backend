@@ -24,7 +24,7 @@ end
 
 config = {
   table_name: "clientes",
-  model_class: Cliente,
+  model_class: Pdv::Cliente,
   singular: "cliente",
   plural: "clientes",
   recriar_env_var: "RECRIAR_CLIENTES",

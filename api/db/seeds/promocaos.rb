@@ -1,6 +1,6 @@
 require "rainbow"
 
-usuario = Usuario.find_by(email: "admin@test.com")
+usuario = Admin::Usuario.find_by(email: "admin@test.com")
 
 unless usuario
   puts Rainbow("Erro: Usuário não encontrado. Execute a seed de Usuario primeiro.").bold.red
@@ -10,7 +10,7 @@ end
 
 config = {
   table_name: 'Promocoes',
-  model_class: Promocao,
+  model_class: Pdv::Promocao,
   singular: 'promocao',
   plural: 'promocoes',
   recriar_env_var: 'RECRIAR_PROMOCOES',

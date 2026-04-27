@@ -2,7 +2,7 @@ require "rainbow"
 
 config = {
   table_name: "Lotes",
-  model_class: Lote,
+  model_class: Estoque::Lote,
   singular: "lote",
   plural: "lotes",
   recriar_env_var: "RECRIAR_LOTES",
@@ -46,7 +46,7 @@ begin
 
     config[:data].each do |record_attrs|
       begin
-        produto = Produto.find_by(nome: record_attrs[:produto_nome])
+        produto = Estoque::Produto.find_by(nome: record_attrs[:produto_nome])
         if produto.nil?
           puts Rainbow("Produto '#{record_attrs[:produto_nome]}' não encontrado. Pulando lote '#{record_attrs[:codigo]}'.").bold.yellow
           next

@@ -2,7 +2,7 @@ require 'rainbow'
 
 config = {
   table_name: 'funcionarios',
-  model_class: Funcionario,
+  model_class: Rh::Funcionario,
   singular: 'funcionario',
   plural: 'funcionarios',
   recriar_env_var: 'RECRIAR_FUNCIONARIOS',
@@ -54,7 +54,7 @@ config = {
       email: 'vice_gerente@test.com',
       data_nascimento: Date.new(1988, 3, 10),
       data_admissao: Date.new(2020, 1, 1),
-      cargo_nome: 'Vice Gerente',
+      cargo_nome: 'sub-Gerente',
       usuario_email: 'vice_gerente@test.com',
       salario: 3500.00,
       tipos_contrato_nome: 'fixo',
@@ -155,22 +155,22 @@ begin
 
     config[:data].each do |record_attrs|
       begin
-        cargo = Cargo.find_by(nome: record_attrs[:cargo_nome].to_s)
+        cargo = Rh::Cargo.find_by(nome: record_attrs[:cargo_nome].to_s)
         unless cargo
           puts "Cargo '#{record_attrs[:cargo_nome]}' não encontrado. Pulando funcionário '#{record_attrs[:cpf]}'."
           next
         end
 
-        usuario = Usuario.find_by(email: record_attrs[:usuario_email])
+        usuario = Admin::Usuario.find_by(email: record_attrs[:usuario_email])
         unless usuario
           puts "Usuario com email '#{record_attrs[:usuario_email]}' não encontrado. Pulando funcionário '#{record_attrs[:cpf]}'."
           next
         end
 
         begin
-          tipo_contrato = TiposContrato.find_or_create_by(nome: record_attrs[:tipos_contrato_nome])
+          tipo_contrato = Admin::TiposContrato.find_or_create_by(nome: record_attrs[:tipos_contrato_nome])
         rescue NameError => e
-          puts "Erro: Classe TiposContrato não encontrada. Verifique se o arquivo do modelo 'tipos_contrato.rb' existe e define a classe corretamente."
+          puts "Erro: Classe Admin::TiposContrato não encontrada. Verifique se o arquivo do modelo 'tipos_contrato.rb' existe e define a classe corretamente."
           raise
         rescue => e
           puts "Erro ao buscar/criar TipoContrato '#{record_attrs[:tipos_contrato_nome]}': #{e.message}. Verifique se a tabela 'tipos_contratos' existe e tem dados."

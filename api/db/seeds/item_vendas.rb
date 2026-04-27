@@ -2,7 +2,7 @@ require "rainbow"
 
 config = {
   table_name: "item_vendas",
-  model_class: ItemVenda,
+  model_class: Pdv::ItemVenda,
   singular: "item_venda",
   plural: "itens de venda",
   recriar_env_var: "RECRIAR_ITEM_VENDAS",
@@ -79,7 +79,7 @@ begin
           next
         end
 
-        lote = Lote.find_by(codigo: record_attrs[:lote_codigo])
+        lote = Estoque::Lote.find_by(codigo: record_attrs[:lote_codigo])
         unless lote
           erros_ao_criar << { item: "lote #{record_attrs[:lote_codigo]}", erro: "Lote não encontrado" }
           puts "Erro ao processar #{config[:singular]} para lote #{record_attrs[:lote_codigo]}: Lote não encontrado"

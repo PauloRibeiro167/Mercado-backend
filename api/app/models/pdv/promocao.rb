@@ -1,7 +1,7 @@
 module Pdv
   class Promocao < ApplicationRecord
-    belongs_to :produto
-    belongs_to :usuario
+    belongs_to :produto, class_name: 'Estoque::Produto'
+    belongs_to :usuario, class_name: 'Admin::Usuario'
 
     # Enum para tipo de promoção
     enum :tipo_promocao, {

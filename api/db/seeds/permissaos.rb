@@ -131,18 +131,18 @@ permissaos = [
 begin
   ActiveRecord::Base.transaction do
     if RECRIAR_PERMISSOES
-      Permissao.where(chave_acao: permissaos.map { |i| i[:chave_acao] }).destroy_all
+      Admin::Permissao.where(chave_acao: permissaos.map { |i| i[:chave_acao] }).destroy_all
       puts Rainbow("Permissões existentes deletadas para recriação").bold.yellow
     end
 
     permissaos_criadas = 0
     permissaos_atualizadas = 0
     erros_ao_criar = []
-    total_antes = Permissao.count
+    total_antes = Admin::Permissao.count
 
     permissaos.each do |permissao_attrs|
       begin
-        record = Permissao.find_or_initialize_by(chave_acao: permissao_attrs[:chave_acao])
+        record = Admin::Permissao.find_or_initialize_by(chave_acao: permissao_attrs[:chave_acao])
         record.assign_attributes(permissao_attrs)
 
         if record.new_record?
@@ -158,7 +158,7 @@ begin
       end
     end
 
-    itens_criados = Permissao.count - total_antes
+    itens_criados = Admin::Permissao.count - total_antes
 
     if itens_criados == 0 && permissaos_atualizadas == 0
       puts Rainbow("\nNenhuma permissão nova criada, pois todas já existem").bold.yellow

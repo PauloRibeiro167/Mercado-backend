@@ -3,7 +3,7 @@ require 'bcrypt'
 
 config = {
   table_name: 'Usuarios',
-  model_class: Usuario,
+  model_class: Admin::Usuario,
   singular: 'usuario',
   plural: 'usuarios',
   recriar_env_var: 'RECRIAR_USUARIOS',
@@ -40,7 +40,7 @@ begin
 
     config[:data].each do |record_attrs|
       begin
-        role = Role.find_by(name: record_attrs[:papel].to_s)
+        role = Admin::Role.find_by(name: record_attrs[:papel].to_s)
         unless role
           puts "Role '#{record_attrs[:papel]}' não encontrada. Pulando usuário '#{record_attrs[:email]}'."
           next
@@ -51,11 +51,9 @@ begin
 
         if record.new_record?
           record.save!
-          record.add_role(record_attrs[:papel].to_s)
           criados += 1
         else
           record.save!
-          record.add_role(record_attrs[:papel].to_s) unless record.has_role?(record_attrs[:papel].to_s)
           atualizados += 1
         end
       rescue => e

@@ -2,7 +2,7 @@ module Estoque
   class ProdutoFornecedor < ApplicationRecord
     belongs_to :produto
     belongs_to :fornecedor
-    belongs_to :usuario
+    belongs_to :usuario, class_name: 'Admin::Usuario'
 
     # Validações
     validates :produto,

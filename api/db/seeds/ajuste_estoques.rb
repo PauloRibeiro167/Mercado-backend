@@ -29,11 +29,11 @@ begin
       { produto_nome: "Leite Integral", codigo: "LOTE003", quantidade_inicial: 50, quantidade_atual: 45, preco_custo: 3.00, data_validade: Date.today + 10.days, data_entrada: Date.today }
     ]
 
-    total_lotes_antes = Lote.count
+    total_lotes_antes = Estoque::Lote.count
     lotes_data.each do |lote_attrs|
-      produto = Produto.find_by(nome: lote_attrs[:produto_nome])
+      produto = Estoque::Produto.find_by(nome: lote_attrs[:produto_nome])
       if produto
-        Lote.find_or_create_by!(codigo: lote_attrs[:codigo]) do |l|
+        Estoque::Lote.find_or_create_by!(codigo: lote_attrs[:codigo]) do |l|
           l.produto_id = produto.id
           l.quantidade_inicial = lote_attrs[:quantidade_inicial]
           l.quantidade_atual = lote_attrs[:quantidade_atual]
@@ -45,7 +45,7 @@ begin
         puts Rainbow("Aviso: Produto '#{lote_attrs[:produto_nome]}' não encontrado. Pulando lote.").yellow
       end
     end
-    lotes_criados = Lote.count - total_lotes_antes
+    lotes_criados = Estoque::Lote.count - total_lotes_antes
 
     if config[:recriar]
       config[:model_class].destroy_all
@@ -58,14 +58,14 @@ begin
 
     config[:data].each do |record_attrs|
       begin
-        lote = Lote.joins(:produto).find_by(produtos: { nome: record_attrs[:lote_produto_nome] })
+        lote = Estoque::Lote.joins(:produto).find_by(produtos: { nome: record_attrs[:lote_produto_nome] })
         unless lote
           erros_ao_criar << { item: "lote #{record_attrs[:lote_produto_nome]}", erro: "Lote não encontrado" }
           puts "Erro ao processar #{config[:singular]} para lote #{record_attrs[:lote_produto_nome]}: Lote não encontrado"
           next
         end
 
-        usuario = Usuario.find_by(email: record_attrs[:usuario_email])
+        usuario = Admin::Usuario.find_by(email: record_attrs[:usuario_email])
         unless usuario
           erros_ao_criar << { item: "usuario #{record_attrs[:usuario_email]}", erro: "Usuário não encontrado" }
           puts "Erro ao processar #{config[:singular]} para usuario #{record_attrs[:usuario_email]}: Usuário não encontrado"

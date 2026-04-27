@@ -1,17 +1,17 @@
 require 'rainbow'
 
-metodo_pagamento = MetodoPagamento.first
-usuario = Usuario.first
-categoria = Categoria.first
+metodo_pagamento = Financeiro::MetodoPagamento.first
+usuario = Admin::Usuario.first
+categoria = Estoque::Categoria.first
 
-fornecedor1 = Fornecedor.find_by(cnpj: "12.345.678/0001-90")
-fornecedor2 = Fornecedor.find_by(cnpj: "98.765.432/0001-10")
-pedido1 = PedidoCompra.find_by(codigo: "PC001")
-pedido2 = PedidoCompra.find_by(codigo: "PC002")
+fornecedor1 = Estoque::Fornecedor.find_by(cnpj: "12.345.678/0001-90")
+fornecedor2 = Estoque::Fornecedor.find_by(cnpj: "98.765.432/0001-10")
+pedido1 = Estoque::PedidoCompra.find_by(codigo: "PC001")
+pedido2 = Estoque::PedidoCompra.find_by(codigo: "PC002")
 
 config = {
   table_name: "conta_pagars",
-  model_class: ContaPagar,
+  model_class: Financeiro::ContaPagar,
   singular: "conta_pagar",
   plural: "conta_pagars",
   recriar_env_var: "RECRIAR_CONTA_PAGARS",

@@ -2,15 +2,15 @@ require 'rainbow'
 
 # Assumindo que você tenha instâncias válidas para associações obrigatórias
 # Substitua por buscas reais ou crie seeds para elas primeiro
-venda = Venda.first # Exemplo: ajuste conforme necessário
-cliente = Cliente.first
-metodo_pagamento = MetodoPagamento.first
-usuario = Usuario.first
-categoria = Categoria.first
+venda = Pdv::Venda.first # Exemplo: ajuste conforme necessário
+cliente = Pdv::Cliente.first
+metodo_pagamento = Financeiro::MetodoPagamento.first
+usuario = Admin::Usuario.first
+categoria = Estoque::Categoria.first
 
 config = {
   table_name: "conta_recebers",
-  model_class: ContaReceber,
+  model_class: Financeiro::ContaReceber,
   singular: "conta_receber",
   plural: "conta_recebers",
   recriar_env_var: "RECRIAR_CONTA_RECEBERS",

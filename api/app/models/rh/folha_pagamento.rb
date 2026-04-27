@@ -1,7 +1,7 @@
 module Rh
   class FolhaPagamento < ApplicationRecord
     belongs_to :funcionario
-    belongs_to :usuario
+    belongs_to :usuario, class_name: 'Admin::Usuario'
     belongs_to :conta_pagar, optional: true
 
     # Validações

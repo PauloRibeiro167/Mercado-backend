@@ -2,7 +2,7 @@ require 'rainbow'
 
 config = {
   table_name: 'tipos_contratos',
-  model_class: TiposContrato,
+  model_class: Admin::TiposContrato,
   singular: 'tipo_contrato',
   plural: 'tipos_contrato',
   recriar_env_var: 'RECRIAR_TIPOS_CONTRATO',

@@ -21,7 +21,7 @@ module Pdv
   #   @return [String] estado operacional atual do caixa.
   class Caixa < ApplicationRecord
     # Associações
-    belongs_to :usuario, optional: true
+    belongs_to :usuario, class_name: 'Admin::Usuario', optional: true
     has_many :sessao_caixas
     has_many :movimentacao_caixas
     has_many :caixa_reconciliacoes

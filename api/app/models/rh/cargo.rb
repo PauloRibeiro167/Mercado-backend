@@ -11,7 +11,7 @@ module Rh
   class Cargo < ApplicationRecord
     # Associação com o usuário que criou o cargo.
     # Obrigatoria, não pode ser nula.
-    belongs_to :criado_por, class_name: "Usuario", optional: false
+    belongs_to :criado_por, class_name: "Admin::Usuario", optional: false
 
     # Validação do nome: presença obrigatória e unicidade.
     validates :nome,

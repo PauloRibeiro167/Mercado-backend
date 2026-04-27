@@ -5,7 +5,7 @@ RECRIAR_USUARIOS_PERFIS = ENV['RECRIAR_USUARIOS_PERFIS'] == 'true'
 
 config = {
   table_name: 'UsuarioPerfils',
-  model_class: UsuarioPerfil,
+  model_class: Admin::UsuarioPerfil,
   singular: 'usuario_perfil',
   plural: 'usuario_perfils',
   recriar_env_var: 'RECRIAR_USUARIOS_PERFIS',
@@ -26,8 +26,6 @@ config = {
   ]
 }
 
-usuarios_perfis = config[:data]
-
 
 begin
   ActiveRecord::Base.transaction do
@@ -43,8 +41,8 @@ begin
 
     config[:data].each do |record_attrs|
       begin
-        usuario = Usuario.find_by(email: record_attrs[:usuario_email])
-        perfil = Perfil.find_by(nome: record_attrs[:perfil_nome])
+        usuario = Admin::Usuario.find_by(email: record_attrs[:usuario_email])
+        perfil = Admin::Perfil.find_by(nome: record_attrs[:perfil_nome])
 
         if usuario.nil?
           raise "Usuário com email '#{record_attrs[:usuario_email]}' não encontrado"
@@ -66,10 +64,6 @@ begin
         puts "Erro ao processar #{config[:singular]} '#{record_attrs[config[:unique_key][0]]}': #{e.message}"
       end
     end
-
-
-
-
 
     itens_criados = config[:model_class].count - total_antes
 

@@ -44,19 +44,19 @@ module Financeiro
     # @!group Associações
 
     # Associação opcional com venda
-    belongs_to :venda, optional: true
+    belongs_to :venda, class_name: 'Pdv::Venda', optional: true
 
     # Associação opcional com cliente
-    belongs_to :cliente, optional: true
+    belongs_to :cliente, class_name: 'Pdv::Cliente', optional: true
 
     # Associação obrigatória com método de pagamento
     belongs_to :metodo_pagamento
 
     # Associação obrigatória com usuário responsável
-    belongs_to :usuario
+    belongs_to :usuario, class_name: 'Admin::Usuario'
 
     # Associação obrigatória com categoria
-    belongs_to :categoria
+    belongs_to :categoria, class_name: 'Estoque::Categoria'
 
     # @!endgroup
 

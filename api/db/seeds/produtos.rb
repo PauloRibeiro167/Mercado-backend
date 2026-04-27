@@ -33,20 +33,20 @@ produtos = [
 begin
   ActiveRecord::Base.transaction do
     if RECRIAR_PRODUTOS
-      Produto.where(nome: produtos.map { |p| p[:nome] }).destroy_all  # Corrigido para Produto
+      Estoque::Produto.where(nome: produtos.map { |p| p[:nome] }).destroy_all  # Corrigido para Produto
       puts Rainbow("Produtos existentes deletados para recriação").bold.yellow
     end
 
     produtos_criados = 0
     produtos_atualizados = 0
     erros_ao_criar = []
-    total_antes = Produto.count
+    total_antes = Estoque::Produto.count
 
     produtos.each do |produto_attrs|
       begin
-        categoria = Categoria.find_or_create_by!(nome: produto_attrs[:categoria_nome])
+        categoria = Estoque::Categoria.find_or_create_by!(nome: produto_attrs[:categoria_nome])
 
-        produto = Produto.find_or_initialize_by(nome: produto_attrs[:nome])
+        produto = Estoque::Produto.find_or_initialize_by(nome: produto_attrs[:nome])
         produto.assign_attributes(
           descricao: produto_attrs[:descricao],
           preco: produto_attrs[:preco],
@@ -69,7 +69,7 @@ begin
       end
     end
 
-    itens_criados = Produto.count - total_antes
+    itens_criados = Estoque::Produto.count - total_antes
     if itens_criados == 0 && itens_atualizados == 0
       puts Rainbow("\nnenhum cargo novo criado, pois todos já exitem").bold.yellow
     else

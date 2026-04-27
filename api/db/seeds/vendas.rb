@@ -2,7 +2,7 @@ require "rainbow"
 
 config = {
   table_name: "vendas",
-  model_class: Venda,
+  model_class: Pdv::Venda,
   singular: "venda",
   plural: "vendas",
   recriar_env_var: "RECRIAR_VENDAS",
@@ -82,8 +82,8 @@ begin
     config[:data].each do |record_attrs|
       begin
         record_attrs_modified = record_attrs.dup
-        cliente = record_attrs[:cliente_nome] ? Cliente.find_by(nome: record_attrs[:cliente_nome]) : nil
-        metodo = MetodoPagamento.find_by(nome: record_attrs[:metodo_pagamento_nome])
+        cliente = record_attrs[:cliente_nome] ? Pdv::Cliente.find_by(nome: record_attrs[:cliente_nome]) : nil
+        metodo = Financeiro::MetodoPagamento.find_by(nome: record_attrs[:metodo_pagamento_nome])
         unless metodo
           erros_ao_criar << { venda: record_attrs[:cliente_nome] || 'Sem cliente', erro: "Método de pagamento '#{record_attrs[:metodo_pagamento_nome]}' não encontrado" }
           puts "Erro ao processar #{config[:singular]} '#{record_attrs[:cliente_nome] || 'Sem cliente'}': Método de pagamento não encontrado"
@@ -108,7 +108,7 @@ begin
 
         # Criar ItemVendas após salvar a venda
         item_vendas.each do |item_attrs|
-          lote = Lote.find_by(codigo: item_attrs[:lote_codigo])
+          lote = Estoque::Lote.find_by(codigo: item_attrs[:lote_codigo])
           unless lote
             puts "Lote '#{item_attrs[:lote_codigo]}' não encontrado. Pulando item."
             next

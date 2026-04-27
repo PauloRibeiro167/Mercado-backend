@@ -1,7 +1,7 @@
 module Financeiro
   class Pagamento < ApplicationRecord
-    belongs_to :pedido_compra, foreign_key: :pedido_compras_id
-    belongs_to :usuario
+    belongs_to :pedido_compra, class_name: 'Estoque::PedidoCompra', foreign_key: :pedido_compras_id
+    belongs_to :usuario, class_name: 'Admin::Usuario'
 
     validates :pedido_compra,
               presence: { message: "Pedido de compra não pode ficar em branco" }

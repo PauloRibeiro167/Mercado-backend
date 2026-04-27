@@ -18,11 +18,11 @@ module Financeiro
   # @attr valor [Decimal] o valor da conta (pode ser nil)
   class ContaPagar < ApplicationRecord
     # Associações
-    belongs_to :fornecedor, optional: true
-    belongs_to :pedido_compra, optional: true
+    belongs_to :fornecedor, class_name: 'Estoque::Fornecedor', optional: true
+    belongs_to :pedido_compra, class_name: 'Estoque::PedidoCompra', optional: true
     belongs_to :metodo_pagamento
-    belongs_to :usuario
-    belongs_to :categoria
+    belongs_to :usuario, class_name: 'Admin::Usuario'
+    belongs_to :categoria, class_name: 'Estoque::Categoria'
     has_many :parcelas, class_name: 'ParcelaContaPagar', dependent: :destroy
 
     # Enums

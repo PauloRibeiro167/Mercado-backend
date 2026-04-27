@@ -1,8 +1,8 @@
 require "rainbow"
 
-caixa = Caixa.first
-responsavel = Usuario.first
-sessao = SessaoCaixa.where(caixa: caixa).first
+caixa = Pdv::Caixa.first
+responsavel = Admin::Usuario.first
+sessao = Pdv::SessaoCaixa.where(caixa: caixa).first
 
 unless caixa && responsavel && sessao
   puts Rainbow("Erro: Caixa, usuário responsável ou sessão compatível não encontrados. Execute as seeds básicas primeiro.").bold.red
@@ -11,7 +11,7 @@ end
 
 config = {
   table_name: "caixa_reconciliacoes",
-  model_class: CaixaReconciliacao,
+  model_class: Financeiro::CaixaReconciliacao,
   singular: "caixa_reconciliacao",
   plural: "caixa_reconciliacoes",
   recriar_env_var: "RECRIAR_CAIXA_RECONCILIACOES",

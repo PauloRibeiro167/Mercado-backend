@@ -7,9 +7,9 @@ conta_caminhao = ContaPagar.find_by(descricao: 'Compra de Caminhão')
 
 # Se não existirem, criar contas básicas
 if !conta_agua
-  metodo_pagamento = MetodoPagamento.first
-  usuario = Usuario.first
-  categoria = Categoria.first
+  metodo_pagamento = Financeiro::MetodoPagamento.first
+  usuario = Admin::Usuario.first
+  categoria = Estoque::Categoria.first
 
   conta_agua = ContaPagar.create!(
     metodo_pagamento: metodo_pagamento,
@@ -27,9 +27,9 @@ if !conta_agua
 end
 
 if !conta_luz
-  metodo_pagamento = MetodoPagamento.first
-  usuario = Usuario.first
-  categoria = Categoria.first
+  metodo_pagamento = Financeiro::MetodoPagamento.first
+  usuario = Admin::Usuario.first
+  categoria = Estoque::Categoria.first
 
   conta_luz = ContaPagar.create!(
     metodo_pagamento: metodo_pagamento,
@@ -47,9 +47,9 @@ if !conta_luz
 end
 
 if !conta_caminhao
-  metodo_pagamento = MetodoPagamento.first
-  usuario = Usuario.first
-  categoria = Categoria.first
+  metodo_pagamento = Financeiro::MetodoPagamento.first
+  usuario = Admin::Usuario.first
+  categoria = Estoque::Categoria.first
 
   conta_caminhao = ContaPagar.create!(
     metodo_pagamento: metodo_pagamento,
@@ -66,7 +66,7 @@ end
 
 config = {
   table_name: "parcela_conta_pagars",
-  model_class: ParcelaContaPagar,
+  model_class: Financeiro::ParcelaContaPagar,
   singular: "parcela_conta_pagar",
   plural: "parcelas_conta_pagar",
   recriar_env_var: "RECRIAR_PARCELAS_CONTA_PAGAR",

@@ -2,7 +2,7 @@ require "rainbow"
 
 config = {
   table_name: "item_pedido_compras",
-  model_class: ItemPedidoCompra,
+  model_class: Estoque::ItemPedidoCompra,
   singular: "item_pedido_compra",
   plural: "item_pedido_compras",
   recriar_env_var: "RECRIAR_ITEM_PEDIDO_COMPRAS",
@@ -65,8 +65,8 @@ begin
 
     config[:data].each do |record_attrs|
       begin
-        pedido = PedidoCompra.find_by(codigo: record_attrs[:pedido_compra_codigo])
-        produto = Produto.find_by(nome: record_attrs[:produto_nome])
+        pedido = Estoque::PedidoCompra.find_by(codigo: record_attrs[:pedido_compra_codigo])
+        produto = Estoque::Produto.find_by(nome: record_attrs[:produto_nome])
         unless pedido && produto
           puts "Pedido ou produto não encontrado para item: #{record_attrs[:pedido_compra_codigo]} - #{record_attrs[:produto_nome]}. Pulando."
           next

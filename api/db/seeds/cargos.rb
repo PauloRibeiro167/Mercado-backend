@@ -1,10 +1,10 @@
 require 'rainbow'
 
-user_ti = Usuario.find_by(email: 'ti@test.com')
+user_ti = Admin::Usuario.find_by(email: 'ti@test.com')
 
 config = {
   table_name: 'Cargos',
-  model_class: Cargo,
+  model_class: Rh::Cargo,
   singular: 'cargo',
   plural: 'cargos',
   recriar_env_var: 'RECRIAR_CARGOS',
@@ -24,7 +24,7 @@ config = {
       criado_por: user_ti
     },
     {
-      nome: 'Vice Gerente',
+      nome: 'sub-Gerente',
       descricao: 'Auxilia o gerente nas funções administrativas e operacionais.',
       atribuicoes: 'Monitoramento de folhas de ponto, apoio na gestão de equipe e substituição do gerente em sua ausência.',
       criado_por: user_ti
@@ -63,6 +63,78 @@ config = {
       nome: 'Auxiliar de Limpeza',
       descricao: 'Mantém a limpeza e organização do estabelecimento.',
       atribuicoes: 'Limpar áreas comuns, organizar espaços e auxiliar em manutenção básica.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Açougueiro',
+      descricao: 'Responsável pelo setor de carnes.',
+      atribuicoes: 'Corte, pesagem, embalagem, controle de qualidade das carnes e atendimento ao cliente no balcão.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Padeiro',
+      descricao: 'Responsável pela produção de pães e derivados.',
+      atribuicoes: 'Preparar massas, assar pães, organizar vitrine da padaria e controlar validade dos insumos.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Repositor',
+      descricao: 'Responsável por manter as prateleiras abastecidas.',
+      atribuicoes: 'Repor produtos nas gôndolas, verificar datas de validade no salão de vendas e precificar mercadorias.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Fiscal de Loja',
+      descricao: 'Atua na prevenção de perdas e segurança do local.',
+      atribuicoes: 'Monitorar o ambiente, prevenir furtos, conferir cupons fiscais e apoiar em situações de emergência.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Empacotador',
+      descricao: 'Auxilia no empacotamento das compras dos clientes.',
+      atribuicoes: 'Embalar produtos de forma organizada e ágil, recolher carrinhos e apoiar o operador de caixa.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Conferente',
+      descricao: 'Verifica as mercadorias recebidas e despachadas.',
+      atribuicoes: 'Conferir notas fiscais, inspecionar a qualidade e quantidade dos produtos recebidos dos fornecedores.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Analista de TI',
+      descricao: 'Suporte técnico e manutenção dos sistemas do mercado.',
+      atribuicoes: 'Manter PDVs funcionando, dar suporte à rede, balanças, impressoras e resolver problemas no software.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Segurança',
+      descricao: 'Responsável pela vigilância e integridade física do local.',
+      atribuicoes: 'Controlar acesso de pessoas, garantir a segurança patrimonial, de clientes e funcionários.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Encarregado de Hortifruti',
+      descricao: 'Especialista no setor de Frutas, Legumes e Verduras (FLV).',
+      atribuicoes: 'Selecionar, higienizar, organizar expositores e descartar produtos avariados para garantir frescor.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Cartazista',
+      descricao: 'Responsável pela comunicação visual de preços e ofertas.',
+      atribuicoes: 'Confeccionar cartazes, faixas promocionais e etiquetas de precificação para gôndolas e ilhas.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Motorista / Entregador',
+      descricao: 'Realiza a entrega das compras e mercadorias.',
+      atribuicoes: 'Conduzir veículo da empresa, conferir pedidos, organizar rotas e entregar compras aos clientes.',
+      criado_por: user_ti
+    },
+    {
+      nome: 'Auxiliar Administrativo',
+      descricao: 'Atua no suporte de backoffice do estabelecimento.',
+      atribuicoes: 'Lançamento de notas fiscais, auxílio no controle de ponto, faturamento e contas a pagar/receber.',
       criado_por: user_ti
     }
   ]

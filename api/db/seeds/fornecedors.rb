@@ -2,7 +2,7 @@ require 'rainbow'
 
 config = {
   table_name: "Fornecedores",
-  model_class: Fornecedor,
+  model_class: Estoque::Fornecedor,
   singular: "fornecedor",
   plural: "fornecedores",
   recriar_env_var: 'RECRIAR_FORNECEDORES',
@@ -86,8 +86,8 @@ begin
 
     config[:data].each do |record_attrs|
       begin
-        usuario = Usuario.find_or_create_by(email: record_attrs[:usuario_email])
-        responsavel = Usuario.find_or_create_by(email: record_attrs[:responsavel_email])
+        usuario = Admin::Usuario.find_or_create_by(email: record_attrs[:usuario_email])
+        responsavel = Admin::Usuario.find_or_create_by(email: record_attrs[:responsavel_email])
         unless usuario && responsavel
           puts "Usuário ou responsável não encontrado para fornecedor '#{record_attrs[:nome]}'. Pulando."
           next

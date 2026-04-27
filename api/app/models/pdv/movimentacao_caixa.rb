@@ -4,7 +4,7 @@ module Pdv
     enum :tipo, %i[entrada saida]
 
     # Associações
-    belongs_to :usuario
+    belongs_to :usuario, class_name: 'Admin::Usuario'
     belongs_to :caixa
     belongs_to :origem, polymorphic: true, optional: true
     belongs_to :sessao_caixa

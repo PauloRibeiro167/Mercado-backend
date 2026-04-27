@@ -4,7 +4,7 @@ module Estoque
   # model de pedido de compra
   class PedidoCompra < ApplicationRecord
     belongs_to :fornecedor
-    belongs_to :usuario
+    belongs_to :usuario, class_name: 'Admin::Usuario'
     has_many :pagamentos, foreign_key: :pedido_compras_id
     has_many :item_pedido_compras, dependent: :destroy
 

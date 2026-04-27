@@ -4,7 +4,7 @@ RECRIAR_PERFIS = ENV['RECRIAR_PERFIS'] == 'true'
 
 config = {
   table_name: 'Perfis',
-  model_class: Perfil,
+  model_class: Admin::Perfil,
   singular: 'perfil',
   plural: 'perfis',
   recriar_env_var: 'RECRIAR_PERFIS',

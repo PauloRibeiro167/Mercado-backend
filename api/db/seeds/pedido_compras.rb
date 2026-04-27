@@ -1,8 +1,8 @@
 require "rainbow"
 
-fornecedor1 = Fornecedor.find_by(cnpj: "12.345.678/0001-90")
-fornecedor2 = Fornecedor.find_by(cnpj: "98.765.432/0001-10")
-usuario = Usuario.find_by(email: "admin@test.com")
+fornecedor1 = Estoque::Fornecedor.find_by(cnpj: "12.345.678/0001-90")
+fornecedor2 = Estoque::Fornecedor.find_by(cnpj: "98.765.432/0001-10")
+usuario = Admin::Usuario.find_by(email: "admin@test.com")
 
 unless fornecedor1 && fornecedor2 && usuario
   puts Rainbow("Erro: Fornecedores ou usuário não encontrados. Execute a seed de fornecedores primeiro.").bold.red
@@ -11,7 +11,7 @@ end
 
 config = {
   table_name: "pedido_compras",
-  model_class: PedidoCompra,
+  model_class: Estoque::PedidoCompra,
   singular: "pedido_compra",
   plural: "pedido_compras",
   recriar_env_var: "RECRIAR_PEDIDO_COMPRAS",
@@ -29,7 +29,7 @@ config = {
       usuario_id: usuario.id,
       recebido: true,
       aprovado: true
-    },
+    },  
     {
       codigo: "PC002",
       fornecedor_id: fornecedor2.id,

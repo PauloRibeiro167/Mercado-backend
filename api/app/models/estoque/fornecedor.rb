@@ -1,7 +1,7 @@
 module Estoque
   class Fornecedor < ApplicationRecord
-    belongs_to :usuario
-    belongs_to :responsavel, class_name: "Usuario"
+    belongs_to :usuario, class_name: "Admin::Usuario"
+    belongs_to :responsavel, class_name: "Admin::Usuario"
 
     has_many :pedido_compras
     has_many :produto_fornecedors

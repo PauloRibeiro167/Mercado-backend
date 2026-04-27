@@ -1,7 +1,7 @@
 module Pdv
   class ItemVenda < ApplicationRecord
     belongs_to :venda
-    belongs_to :lote
+    belongs_to :lote, class_name: 'Estoque::Lote'
 
     # Validações
     validates :quantidade,
