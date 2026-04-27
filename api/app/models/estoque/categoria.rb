@@ -1,4 +1,16 @@
 class Estoque::Categoria < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("categorias_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
 # Modelo que representa uma categoria de produtos no sistema.
 #
 # Esta classe funciona como um tipo ou classe de produtos, permitindo classificar e organizar
@@ -76,22 +88,7 @@ scope :por_ordem, -> { order(:ordem) }
   # @return [String, nil] a imagem decodificada ou nil se inválida
   def imagem_decodificada
     decodificar_base64(:imagem)
-  end
-
-
-
-
-  
-  after_commit :avisar_frontends, on: [:create, :update]
-
-  private
-
-  def avisar_frontends
-    ActionCable.server.broadcast("#{ch}", { acao: "atualizado", id: self.id })
-  end
-
-  public
-  private
+  end  private
 
   # Define a ordem da categoria na criação.
   #
