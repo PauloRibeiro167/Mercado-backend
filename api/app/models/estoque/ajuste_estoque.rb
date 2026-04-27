@@ -1,4 +1,16 @@
 class Estoque::AjusteEstoque < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("ajuste_estoques_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
   # model de ajustes de estoque.
   #
   # Esta Model lida com ajustes no estoque de inventário, incluindo entradas, saídas e ajustes.
