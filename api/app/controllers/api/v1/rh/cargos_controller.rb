@@ -22,8 +22,30 @@ class Api::V1::Rh::CargosController < ApplicationController
   #   GET /api/v1/cargos
   #   # Retorna: [{ "id": 1, "nome": "Gerente", ... }, ...]
   def index
-    @cargos = Cargo.all
-    render json: @cargos.map { |cargo| format_cargo_json(cargo) }
+    ultimo_atualizado = Cargo.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @cargos = Cargo.all
+      render json: @cargos.map { |item| format_cargo_json(item) }
+    end
+  end
+
+  # GET /cargos/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @cargos_alterados = Cargo.where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @cargos_alterados.map { |item| format_cargo_json(item) }
+    }
   end
 
   # Exibe os detalhes de um cargo específico.
