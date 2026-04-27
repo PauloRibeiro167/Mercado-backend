@@ -24,8 +24,30 @@ class Api::V1::Estoque::CategoriaController < ApplicationController
   #   GET /api/v1/categoria
   #   # Retorna: [{ "id": 1, "nome": "Laticínios", "categoria_pai": null, ... }, ...]
   def index
-  @categorias = Categoria.all
-  render json: @categorias.map { |categoria| format_categoria_json(categoria) }
+    ultimo_atualizado = Categoria.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @categorias = Categoria.all
+      render json: @categorias.map { |item| format_categoria_json(item) }
+    end
+  end
+
+  # GET /categorias/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @categorias_alterados = Categoria.where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @categorias_alterados.map { |item| format_categoria_json(item) }
+    }
   end
 
   # Exibe os detalhes de uma categoria específica.
