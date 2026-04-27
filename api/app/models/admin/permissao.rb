@@ -10,4 +10,14 @@ class Admin::Permissao < ApplicationRecord
   validates :chave_acao,
             presence: { message: "Chave de ação não pode ficar em branco" },
             uniqueness: { message: "Chave de ação já está em uso" }
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("#{ch}", { acao: "atualizado", id: self.id })
+  end
+
+  public
 end
