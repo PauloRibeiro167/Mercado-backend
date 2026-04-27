@@ -16,6 +16,9 @@ class CreateContaPagars < ActiveRecord::Migration[8.0]
       t.boolean :recorrente, default: false
       t.string :intervalo_recorrencia
 
+      # Soft Delete (Discard)
+      t.datetime :discarded_at
+      t.index :discarded_at
       t.timestamps
     end
 

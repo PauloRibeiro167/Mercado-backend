@@ -26,6 +26,9 @@ class CreateContaRecebers < ActiveRecord::Migration[8.0]
       t.date       :data_proxima_recorrencia
       t.boolean    :paga, default: false
 
+      # Soft Delete (Discard)
+      t.datetime :discarded_at
+      t.index :discarded_at
       t.timestamps
     end
 

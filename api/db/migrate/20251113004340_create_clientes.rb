@@ -8,6 +8,9 @@ class CreateClientes < ActiveRecord::Migration[8.0]
       t.date     :data_nascimento
       t.boolean  :ativo, default: true, null: false
 
+      # Soft Delete (Discard)
+      t.datetime :discarded_at
+      t.index :discarded_at
       t.timestamps
     end
 

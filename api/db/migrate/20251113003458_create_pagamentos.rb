@@ -8,6 +8,9 @@ class CreatePagamentos < ActiveRecord::Migration[8.0]
       t.text :observacao
       t.decimal :valor_pago
 
+      # Soft Delete (Discard)
+      t.datetime :discarded_at
+      t.index :discarded_at
       t.timestamps
     end
   end

@@ -16,6 +16,9 @@ class CreatePedidoCompras < ActiveRecord::Migration[8.0]
       t.decimal :valor_retorno, precision: 10, scale: 2
       t.string :tipo_pagamento
 
+      # Soft Delete (Discard)
+      t.datetime :discarded_at
+      t.index :discarded_at
       t.timestamps
     end
     add_index :pedido_compras, :codigo, unique: true

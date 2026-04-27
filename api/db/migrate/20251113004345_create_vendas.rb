@@ -17,6 +17,9 @@ class CreateVendas < ActiveRecord::Migration[8.0]
       t.string :motivo_cancelamento, null: true
       t.text :detalhes_cancelamento, null: true
 
+      # Soft Delete (Discard)
+      t.datetime :discarded_at
+      t.index :discarded_at
       t.timestamps
     end
 

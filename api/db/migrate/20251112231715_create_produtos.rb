@@ -13,6 +13,9 @@ class CreateProdutos < ActiveRecord::Migration[8.0]
       t.integer :estoque_minimo
       t.string :localizacao
 
+      # Soft Delete (Discard)
+      t.datetime :discarded_at
+      t.index :discarded_at
       t.timestamps
     end
   end

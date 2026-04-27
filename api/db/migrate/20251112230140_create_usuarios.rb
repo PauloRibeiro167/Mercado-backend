@@ -27,6 +27,9 @@ class CreateUsuarios < ActiveRecord::Migration[8.0]
       t.datetime :confirmado_em
       t.datetime :enviado_em_confirmacao
 
+      # Soft Delete (Discard)
+      t.datetime :discarded_at
+      t.index :discarded_at
       t.timestamps
     end
 

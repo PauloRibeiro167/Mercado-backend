@@ -28,6 +28,9 @@ class CreateFornecedors < ActiveRecord::Migration[8.0]
       t.references :usuario, null: false, foreign_key: { to_table: :usuarios }, comment: "Usuário que cadastrou o fornecedor"
       t.references :responsavel, null: false, foreign_key: { to_table: :usuarios }, comment: "Usuário responsável por contatos com este fornecedor"
 
+      # Soft Delete (Discard)
+      t.datetime :discarded_at
+      t.index :discarded_at
       t.timestamps
     end
   end

@@ -10,6 +10,9 @@ class CreateLotes < ActiveRecord::Migration[8.0]
       t.date :data_validade
       t.date :data_entrada
 
+      # Soft Delete (Discard)
+      t.datetime :discarded_at
+      t.index :discarded_at
       t.timestamps
     end
     add_index :lotes, :codigo, unique: true
