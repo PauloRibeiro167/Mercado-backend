@@ -41,6 +41,20 @@ module Financeiro
   # @!attribute [rw] updated_at
   #   @return [DateTime] Data e hora da última atualização do registro
   class ContaReceber < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("conta_recebers_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
+  include Discard::Model
+
     # @!group Associações
 
     # Associação opcional com venda
