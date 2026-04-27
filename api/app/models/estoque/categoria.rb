@@ -25,7 +25,7 @@ class Estoque::Categoria < ApplicationRecord
   include Estoque::Base64Decodable
   include Hierarquia
 
-  self.table_name = "categorias"
+  self.table_name = "categoria"
 
   belongs_to :criado_por, class_name: "Admin::Usuario", optional: true
 
