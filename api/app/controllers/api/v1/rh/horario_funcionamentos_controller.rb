@@ -1,50 +1,72 @@
 class Api::V1::Rh::HorarioFuncionamentosController < ApplicationController
 before_action :set_horario_funcionamento, only: %i[ show update destroy ]
 
-rescue_from ActiveRecord::RecordNotFound do
-  render json: { success: false, errors: [ { campo: :id, mensagem: "Horário de funcionamento não encontrado" } ] }, status: :not_found
-end
-
-# GET /horario_funcionamentos
-def index
-  @horario_funcionamentos = HorarioFuncionamento.all
-  render json: @horario_funcionamentos.map { |horario_funcionamento| format_horario_funcionamento_json(horario_funcionamento) }
-end
-
-# GET /horario_funcionamentos/1
-def show
-  render json: format_horario_funcionamento_json(@horario_funcionamento)
-end
-
-# POST /horario_funcionamentos
-def create
-  @horario_funcionamento = HorarioFuncionamento.new(horario_funcionamento_params)
-
-  if @horario_funcionamento.save
-    render json: format_horario_funcionamento_json(@horario_funcionamento), status: :created, location: @horario_funcionamento
-  else
-    render_errors(@horario_funcionamento)
+  rescue_from ActiveRecord::RecordNotFound do
+    render json: { success: false, errors: [ { campo: :id, mensagem: "Horário de funcionamento não encontrado" } ] }, status: :not_found
   end
-rescue ArgumentError => e
-  render_invalid_enum(e)
-end
 
-# PATCH/PUT /horario_funcionamentos/1
-def update
-  if @horario_funcionamento.update(horario_funcionamento_params)
+  # GET /horario_funcionamentos
+  def index
+    ultimo_atualizado = HorarioFuncionamento.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @horario_funcionamentos = HorarioFuncionamento.active.all
+      render json: @horario_funcionamentos.map { |item| format_horario_funcionamento_json(item) }
+    end
+  end
+
+  # GET /horario_funcionamentos/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: [ "O parâmetro 'desde' é obrigatório" ] }, status: :bad_request
+      return
+    end
+
+    @horario_funcionamentos_alterados = HorarioFuncionamento.where("updated_at > ?", data_ultima_sincronizacao)
+
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @horario_funcionamentos_alterados.map { |item| format_horario_funcionamento_json(item) }
+    }
+  end
+
+  # GET /horario_funcionamentos/1
+  def show
     render json: format_horario_funcionamento_json(@horario_funcionamento)
-  else
-    render_errors(@horario_funcionamento)
   end
-rescue ArgumentError => e
-  render_invalid_enum(e)
-end
 
-# DELETE /horario_funcionamentos/1
-def destroy
-  @horario_funcionamento.destroy!
-  render json: { success: true, message: "Horário de funcionamento removido com sucesso" }, status: :ok
-end
+  # POST /horario_funcionamentos
+  def create
+    @horario_funcionamento = HorarioFuncionamento.new(horario_funcionamento_params)
+
+    if @horario_funcionamento.save
+      render json: format_horario_funcionamento_json(@horario_funcionamento), status: :created, location: @horario_funcionamento
+    else
+      render_errors(@horario_funcionamento)
+    end
+  rescue ArgumentError => e
+    render_invalid_enum(e)
+  end
+
+  # PATCH/PUT /horario_funcionamentos/1
+  def update
+    if @horario_funcionamento.update(horario_funcionamento_params)
+      render json: format_horario_funcionamento_json(@horario_funcionamento)
+    else
+      render_errors(@horario_funcionamento)
+    end
+  rescue ArgumentError => e
+    render_invalid_enum(e)
+  end
+
+  # DELETE /horario_funcionamentos/1
+  def destroy
+    @horario_funcionamento.destroy!
+    render json: { success: true, message: "Horário de funcionamento removido com sucesso" }, status: :ok
+  end
 
 private
 
