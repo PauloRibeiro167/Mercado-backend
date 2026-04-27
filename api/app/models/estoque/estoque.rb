@@ -91,4 +91,14 @@ module Estoque
       calcular_media_vendas_diarias if delta < 0  # Recalcula após venda
     end
   end
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("#{ch}", { acao: "atualizado", id: self.id })
+  end
+
+  public
 end
