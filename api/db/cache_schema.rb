@@ -76,7 +76,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_06_123721) do
     t.index ["usuario_responsavel_id"], name: "index_caixa_reconciliacoes_on_usuario_responsavel_id"
     t.check_constraint "saldo_fisico >= 0::numeric", name: "saldo_fisico_nao_negativo"
     t.check_constraint "saldo_registrado >= 0::numeric", name: "saldo_registrado_nao_negativo"
-    t.check_constraint "status::text = ANY (ARRAY['pendente'::character varying, 'aprovado'::character varying, 'rejeitado'::character varying]::text[])", name: "status_reconciliacao_valido"
+    t.check_constraint "status::text = ANY (ARRAY['pendente'::character varying::text, 'aprovado'::character varying::text, 'rejeitado'::character varying::text])", name: "status_reconciliacao_valido"
   end
 
   create_table "caixas", comment: "Tabela para gerenciar caixas registradoras, incluindo saldo e status de operação", force: :cascade do |t|
@@ -105,7 +105,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_06_123721) do
     t.check_constraint "saldo >= 0::numeric", name: "saldo_nao_negativo"
     t.check_constraint "saldo_final >= 0::numeric", name: "saldo_final_nao_negativo"
     t.check_constraint "saldo_inicial >= 0::numeric", name: "saldo_inicial_nao_negativo"
-    t.check_constraint "status::text = ANY (ARRAY['operacional'::character varying, 'bloqueado'::character varying, 'encerrado'::character varying]::text[])", name: "status_caixa_valido"
+    t.check_constraint "status::text = ANY (ARRAY['operacional'::character varying::text, 'bloqueado'::character varying::text, 'encerrado'::character varying::text])", name: "status_caixa_valido"
   end
 
   create_table "cargos", force: :cascade do |t|
@@ -605,7 +605,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_06_123721) do
     t.index ["usuario_abertura_id"], name: "index_sessao_caixas_on_usuario_abertura_id"
     t.index ["usuario_fechamento_id"], name: "index_sessao_caixas_on_usuario_fechamento_id"
     t.index ["usuario_id"], name: "index_sessao_caixas_on_usuario_id"
-    t.check_constraint "status::text = ANY (ARRAY['aberta'::character varying, 'fechada'::character varying, 'cancelada'::character varying]::text[])", name: "status_valido"
+    t.check_constraint "status::text = ANY (ARRAY['aberta'::character varying::text, 'fechada'::character varying::text, 'cancelada'::character varying::text])", name: "status_valido"
     t.check_constraint "usuario_abertura_id = usuario_fechamento_id OR fechamento IS NULL", name: "mesmo_usuario_abre_fecha_sessao"
     t.check_constraint "valor_final >= 0::numeric", name: "valor_final_nao_negativo"
     t.check_constraint "valor_inicial >= 0::numeric", name: "valor_inicial_nao_negativo"
