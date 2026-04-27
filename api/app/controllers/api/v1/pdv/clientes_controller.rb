@@ -22,8 +22,30 @@ class Api::V1::Pdv::ClientesController < ApplicationController
   #   GET /api/v1/clientes
   #   # Retorna: [{ "id": 1, "nome": "João Silva", "cpf": "123.456.789-00", ... }, ...]
   def index
-    @clientes = Cliente.all
-    render json: @clientes.map { |cliente| format_cliente_json(cliente) }
+    ultimo_atualizado = Cliente.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @clientes = Cliente.all
+      render json: @clientes.map { |item| format_cliente_json(item) }
+    end
+  end
+
+  # GET /clientes/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @clientes_alterados = Cliente.where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @clientes_alterados.map { |item| format_cliente_json(item) }
+    }
   end
 
   # Exibe os detalhes de um cliente específico.
