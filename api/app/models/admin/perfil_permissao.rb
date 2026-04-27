@@ -1,5 +1,17 @@
 class Admin::PerfilPermissao < ApplicationRecord
-#{injection}  self.table_name = 'perfil_permissoes'
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("perfil_permissaos_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
+  self.table_name = 'perfil_permissoes'
   
   belongs_to :perfil
   belongs_to :permissao
