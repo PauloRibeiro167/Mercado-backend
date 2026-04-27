@@ -1,4 +1,16 @@
 class Admin::Usuario < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("usuarios_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
   include Discard::Model
 
   self.table_name = "usuarios"
@@ -38,15 +50,4 @@ class Admin::Usuario < ApplicationRecord
 
   def self.policy_class
     UsuarioPolicy
-  end
-
-  after_commit :avisar_frontends, on: [:create, :update]
-
-  private
-
-  def avisar_frontends
-    ActionCable.server.broadcast("#{ch}", { acao: "atualizado", id: self.id })
-  end
-
-  public
-end
+  endend
