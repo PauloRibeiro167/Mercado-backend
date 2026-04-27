@@ -8,7 +8,7 @@ end
 # GET /produtos
 def index
   ultimo_atualizado = Produto.maximum(:updated_at)
-  
+
   if stale?(last_modified: ultimo_atualizado)
     @produtos = Produto.includes(:categoria, :lotes).all
     render json: @produtos.map { |produto| format_produto_json(produto) }
@@ -18,14 +18,14 @@ end
 # GET /produtos/sync
 def sync
   data_ultima_sincronizacao = params[:desde]
-  
+
   unless data_ultima_sincronizacao.present?
     render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
     return
   end
-  
+
   @produtos_alterados = Produto.includes(:categoria, :lotes).where('updated_at > ?', data_ultima_sincronizacao)
-  
+
   render json: {
     sucesso: true,
     data_sincronizacao_atual: Time.current,
