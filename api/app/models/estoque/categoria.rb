@@ -1,16 +1,5 @@
-class Estoque::Categoria < ApplicationRecord
+# frozen_string_literal: true
 
-  include Discard::Model if defined?(Discard::Model)
-
-  after_commit :avisar_frontends, on: [:create, :update]
-
-  private
-
-  def avisar_frontends
-    ActionCable.server.broadcast("categorias_channel", { acao: "atualizado", id: self.id })
-  end
-
-  public
 # Modelo que representa uma categoria de produtos no sistema.
 #
 # Esta classe funciona como um tipo ou classe de produtos, permitindo classificar e organizar
@@ -31,79 +20,57 @@ class Estoque::Categoria < ApplicationRecord
 # @attr imagem [String] a imagem da categoria em base64
 # @attr categoria_pai [Categoria] a categoria pai (opcional, para hierarquia)
 # @attr criado_por [Usuario] o usuário que criou a categoria
-self.table_name = "categorias"
-
-  # Use proper module namespaces to resolve Base64 decoding and hierarchy helpers
+class Estoque::Categoria < ApplicationRecord
+  include Discard::Model if defined?(Discard::Model)
   include Estoque::Base64Decodable
   include Hierarquia
 
-# Associações
-# Usuário que criou a categoria (opcional)
-belongs_to :criado_por, class_name: "Admin::Usuario", optional: true
+  self.table_name = "categorias"
 
-# Enum para status da categoria com prefixo
-enum :status_da_categoria, {
-  disponivel: 0,
-  inativo: 1,
-  arquivado: 2
-}, prefix: :categoria
+  belongs_to :criado_por, class_name: "Admin::Usuario", optional: true
 
-# Callbacks
-# Define a ordem automaticamente na criação se não fornecida
-before_validation :set_ordem, on: :create
-# Define o status padrão como disponível na criação
-before_validation :set_default_status, on: :create
+  enum :status_da_categoria, {
+    disponivel: 0,
+    inativo: 1,
+    arquivado: 2
+  }, prefix: :categoria
 
-# Validações
-# Nome: presença, unicidade e comprimento máximo
-validates :nome,
-          presence: { message: "não pode ficar em branco" },
-          uniqueness: { message: "já está em uso" },
-          length: { maximum: 255, message: "deve ter no máximo 255 caracteres" }
-# Ordem: presença e numérica inteira positiva
-validates :ordem, presence: true, numericality: { only_integer: true, greater_than: 0 }
-# Status: deve estar na lista de valores permitidos
-validates :status_da_categoria, inclusion: { in: status_da_categoria.keys }
-# Excluído: deve ser booleano
-validates :excluido, inclusion: { in: [ true, false ] }
-# Taxa de lucro: numérica inteira não negativa (opcional)
-validates :taxa_de_lucro,
-          numericality: { greater_than_or_equal_to: 0, only_integer: true },
-          allow_nil: true
-# Imposto: numérico não negativo
-validates :imposto, numericality: { greater_than_or_equal_to: 0 }
+  scope :ativas, -> { where(status_da_categoria: :disponivel) }
+  scope :nao_excluidas, -> { where(excluido: false) }
+  scope :por_ordem, -> { order(:ordem) }
 
-# Escopos
-# Retorna apenas categorias ativas (disponíveis)
-scope :ativas, -> { where(status_da_categoria: :disponivel) }
-# Retorna apenas categorias não excluídas
-scope :nao_excluidas, -> { where(excluido: false) }
-# Ordena por ordem ascendente
-scope :por_ordem, -> { order(:ordem) }
+  validates :nome,
+            presence: { message: "não pode ficar em branco" },
+            uniqueness: { message: "já está em uso" },
+            length: { maximum: 255, message: "deve ter no máximo 255 caracteres" }
+  validates :ordem, presence: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :status_da_categoria, inclusion: { in: status_da_categoria.keys }
+  validates :excluido, inclusion: { in: [ true, false ] }
+  validates :taxa_de_lucro,
+            numericality: { greater_than_or_equal_to: 0, only_integer: true },
+            allow_nil: true
+  validates :imposto, numericality: { greater_than_or_equal_to: 0 }
 
-# Métodos públicos
+  before_validation :set_ordem, on: :create
+  before_validation :set_default_status, on: :create
 
-  # Decodifica a imagem em base64 para bytes.
-  #
-  # @return [String, nil] a imagem decodificada ou nil se inválida
+  after_commit :avisar_frontends, on: %i[create update]
+
   def imagem_decodificada
     decodificar_base64(:imagem)
-  end  private
-
-  # Define a ordem da categoria na criação.
-  #
-  # @return [void]
-  # @private
-  def set_ordem
-    self.ordem = (Categoria.maximum(:ordem) || 0) + 1 if ordem.blank?
   end
 
-  # Define o status padrão como disponível na criação.
-  #
-  # @return [void]
-  # @private
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("categorias_channel", { acao: "atualizado", id: id })
+  end
+
+  def set_ordem
+    self.ordem = (self.class.maximum(:ordem) || 0) + 1 if ordem.blank?
+  end
+
   def set_default_status
     self.status_da_categoria ||= :disponivel
   end
-
 end
