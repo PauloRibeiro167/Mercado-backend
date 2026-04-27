@@ -7,9 +7,31 @@ end
 
 # GET /promocaos
 def index
-  @promocaos = Promocao.includes(:produto).all
-  render json: @promocaos.map { |promocao| format_promocao_json(promocao) }
-end
+    ultimo_atualizado = Promocao.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @promocaos = Promocao.includes(:produto).all
+      render json: @promocaos.map { |item| format_promocao_json(item) }
+    end
+  end
+
+  # GET /promocaos/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @promocaos_alterados = Promocao.includes(:produto).where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @promocaos_alterados.map { |item| format_promocao_json(item) }
+    }
+  end
 
 # GET /promocaos/1
 def show
