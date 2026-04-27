@@ -1,4 +1,16 @@
 class Admin::Role < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("roles_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
   self.table_name = "roles"
 
   has_many :usuarios, class_name: "Admin::Usuario"
