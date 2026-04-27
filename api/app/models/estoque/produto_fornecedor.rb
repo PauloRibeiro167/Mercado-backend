@@ -1,8 +1,20 @@
-module Estoque
-  class ProdutoFornecedor < ApplicationRecord
+class ProdutoFornecedor < ApplicationRecord
+  include Discard::Model if defined?(Discard::Model)
+
+  self.table_name = "produto_fornecedors"
+
+  after_commit :avisar_frontends, on: [ :create, :update ]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("produto_fornecedors_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
     belongs_to :produto
     belongs_to :fornecedor
-    belongs_to :usuario, class_name: 'Admin::Usuario'
+    belongs_to :usuario, class_name: "Admin::Usuario"
 
     # Validações
     validates :produto,
@@ -25,5 +37,4 @@ module Estoque
     validates :codigo_fornecedor,
               uniqueness: { scope: [ :produto_id, :fornecedor_id ], message: "Código do fornecedor já está em uso para este produto e fornecedor" },
               allow_nil: true
-  end
 end
