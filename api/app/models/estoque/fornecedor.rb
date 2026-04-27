@@ -1,5 +1,7 @@
 module Estoque
   class Fornecedor < ApplicationRecord
+  include Discard::Model
+
     belongs_to :usuario, class_name: "Admin::Usuario"
     belongs_to :responsavel, class_name: "Admin::Usuario"
 
