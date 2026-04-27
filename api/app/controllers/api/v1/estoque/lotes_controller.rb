@@ -7,9 +7,31 @@ end
 
 # GET /lotes
 def index
-  @lotes = Lote.all
-  render json: @lotes.map { |lote| format_lote_json(lote) }
-end
+    ultimo_atualizado = Lote.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @lotes = Lote.all
+      render json: @lotes.map { |item| format_lote_json(item) }
+    end
+  end
+
+  # GET /lotes/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @lotes_alterados = Lote.where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @lotes_alterados.map { |item| format_lote_json(item) }
+    }
+  end
 
 # GET /lotes/1
 def show
