@@ -1,8 +1,9 @@
 class Admin::Usuario < ApplicationRecord
-
   include Discard::Model if defined?(Discard::Model)
 
-  after_commit :avisar_frontends, on: [:create, :update]
+  self.table_name = "usuarios"
+
+  after_commit :avisar_frontends, on: [ :create, :update ]
 
   private
 
@@ -11,7 +12,6 @@ class Admin::Usuario < ApplicationRecord
   end
 
   public
-  include Discard::Model
 
   self.table_name = "usuarios"
 
@@ -50,4 +50,5 @@ class Admin::Usuario < ApplicationRecord
 
   def self.policy_class
     UsuarioPolicy
-  endend
+  end
+end
