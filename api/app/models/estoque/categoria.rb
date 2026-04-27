@@ -21,8 +21,9 @@ class Estoque::Categoria < ApplicationRecord
 # @attr criado_por [Usuario] o usuário que criou a categoria
 self.table_name = "categorias"
 
-  include Base64Decodable
-  include Hierarchical
+  # Use proper module namespaces to resolve Base64 decoding and hierarchy helpers
+  include Estoque::Base64Decodable
+  include Hierarquia
 
 # Associações
 # Usuário que criou a categoria (opcional)
@@ -80,6 +81,16 @@ scope :por_ordem, -> { order(:ordem) }
 
 
 
+  
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("#{ch}", { acao: "atualizado", id: self.id })
+  end
+
+  public
   private
 
   # Define a ordem da categoria na criação.
@@ -99,4 +110,3 @@ scope :por_ordem, -> { order(:ordem) }
   end
 
 end
-
