@@ -1,78 +1,60 @@
-module Estoque
-  class Produto < ApplicationRecord
-    belongs_to :categoria
-    has_many :estoques, dependent: :destroy
-    has_many :lotes, dependent: :destroy
-    has_many :item_pedido_compras, dependent: :destroy
-    has_many :promocaos, dependent: :destroy
+class Produto < ApplicationRecord
+  include Discard::Model if defined?(Discard::Model)
 
-    # Validações baseadas nos campos da migration
-    validates :nome,
-              presence: { message: "Nome não pode ficar em branco" }
+  self.table_name = "produtos"
 
-    validates :preco,
-              presence: { message: "Preço não pode ficar em branco" },
-              numericality: { greater_than_or_equal_to: 0, message: "Preço deve ser maior ou igual a zero" }
+  belongs_to :categoria
+  has_many :estoques, dependent: :destroy
+  has_many :lotes, dependent: :destroy
+  has_many :item_pedido_compras, dependent: :destroy
+  has_many :promocaos, dependent: :destroy
 
-    validates :preco_custo,
-              numericality: { greater_than_or_equal_to: 0, message: "Preço de custo deve ser maior ou igual a zero" },
-              allow_nil: true
+  scope :todos_existentes, -> { includes(:categoria) }
 
-    validates :categoria_id,
-              presence: { message: "Categoria não pode ficar em branco" }
+  validates :nome, presence: { message: "Nome não pode ficar em branco" }
+  validates :preco, presence: { message: "Preço não pode ficar em branco" }, numericality: { greater_than_or_equal_to: 0, message: "Preço deve ser maior ou igual a zero" }
+  validates :preco_custo, numericality: { greater_than_or_equal_to: 0, message: "Preço de custo deve ser maior ou igual a zero" }, allow_nil: true
+  validates :categoria_id, presence: { message: "Categoria não pode ficar em branco" }
+  validates :estoque_minimo, numericality: { only_integer: true, greater_than_or_equal_to: 0, message: "Estoque mínimo deve ser um número inteiro maior ou igual a zero" }, allow_nil: true
+  validates :ativo, inclusion: { in: [ true, false ], message: "Ativo deve ser verdadeiro ou falso" }, allow_nil: true
 
-    validates :estoque_minimo,
-              numericality: { only_integer: true, greater_than_or_equal_to: 0, message: "Estoque mínimo deve ser um número inteiro maior ou igual a zero" },
-              allow_nil: true
+  after_commit :broadcast_atualizacao, on: %i[create update]
 
-    validates :ativo,
-              inclusion: { in: [ true, false ], message: "Ativo deve ser verdadeiro ou falso" },
-              allow_nil: true
+  def quantidade_total
+    estoque_calculator.quantidade_total
+  end
 
-    def quantidade_total
-      estoques.sum(:quantidade_atual)
-    end
+  def estoque_total
+    quantidade_total
+  end
 
-    def valor_estoque
-      estoques.sum { |estoque| estoque.quantidade_atual * (estoque.lote&.preco_custo || preco_custo).to_f }
-    end
+  def valor_estoque
+    estoque_calculator.valor_estoque
+  end
 
-    def status_estoque
-      total = quantidade_total
-      minimo = estoque_minimo || estoques.minimum(:quantidade_minima) || 0
+  def status_estoque
+    estoque_calculator.status_estoque
+  end
 
-      if total == 0
-        "esgotado"
-      elsif total <= minimo
-        "baixo"
-      else
-        "normal"
-      end
-    end
+  def lote_custo_referencia
+    estoque_calculator.lote_custo_referencia
+  end
 
-    def estoque_total
-      estoques.sum(:quantidade_atual)
-    end
+  def preco_base_custo
+    estoque_calculator.preco_base_custo
+  end
 
-    def self.todos_existentes
-      includes(:categoria).all
-    end
+  def preco_venda_sugerido
+    Estoque::CalculadoraDePrecoService.new(categoria, preco_base_custo).calcular
+  end
 
-    def lote_custo_referencia
-      lotes.where("quantidade_disponivel > 0").order(preco_custo: :desc).first
-    end
+  private
 
-    def preco_base_custo
-      lote_custo_referencia&.preco_custo
-    end
+  def broadcast_atualizacao
+    Produtos::NotificadorService.new(self).atualizado
+  end
 
-    def preco_venda_sugerido
-      base = preco_base_custo
-      return nil unless base
-
-      margem = (categoria&.taxa_de_lucro || 0).to_d / 100
-      imposto = (categoria&.imposto || 0).to_d
-      base.to_d * (1 + margem) + imposto
-    end
+  def estoque_calculator
+    @estoque_calculator ||= Estoque::ProdutoEstoqueService.new(self)
   end
 end
