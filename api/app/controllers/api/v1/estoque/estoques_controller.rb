@@ -12,8 +12,30 @@ class Api::V1::Estoque::EstoquesController < ApplicationController
   # @return [String] JSON contendo um array de estoques com detalhes formatados e status HTTP 200
   # GET /api/v1/estoques
   def index
-    @estoques = Estoque.all
-    render json: @estoques.map { |estoque| format_estoque_json(estoque) }
+    ultimo_atualizado = Estoque.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @estoques = Estoque.all
+      render json: @estoques.map { |item| format_estoque_json(item) }
+    end
+  end
+
+  # GET /estoques/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @estoques_alterados = Estoque.where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @estoques_alterados.map { |item| format_estoque_json(item) }
+    }
   end
 
   # Retorna os detalhes de um estoque específico.
