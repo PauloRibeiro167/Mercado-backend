@@ -12,8 +12,30 @@ class Api::V1::Pdv::CaixasController < ApplicationController
   #
   # @return [void]
   def index
-    @caixas = Caixa.includes(:usuario, :sessao_caixas, :movimentacao_caixas).all
-    render json: @caixas.map { |caixa| format_caixa_json(caixa) }
+    ultimo_atualizado = Caixa.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @caixas = Caixa.includes(:usuario, :sessao_caixas, :movimentacao_caixas).all
+      render json: @caixas.map { |item| format_caixa_json(item) }
+    end
+  end
+
+  # GET /caixas/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @caixas_alterados = Caixa.includes(:usuario, :sessao_caixas, :movimentacao_caixas).where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @caixas_alterados.map { |item| format_caixa_json(item) }
+    }
   end
 
   # Exibe um caixa específico com seus relacionamentos.
