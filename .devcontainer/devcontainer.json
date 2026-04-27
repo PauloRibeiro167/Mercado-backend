@@ -12,7 +12,7 @@
   },
 
   // Porta padrão do Rails
-  "forwardPorts": [3000],
+  "forwardPorts": [3000, 8808],
 
   // Comando pós-criação para instalar dependências Ruby
   "postCreateCommand": "bundle install"
