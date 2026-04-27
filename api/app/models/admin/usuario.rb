@@ -1,4 +1,6 @@
 class Admin::Usuario < ApplicationRecord
+  include Discard::Model
+
   self.table_name = "usuarios"
 
   has_secure_password :senha
@@ -37,4 +39,14 @@ class Admin::Usuario < ApplicationRecord
   def self.policy_class
     UsuarioPolicy
   end
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("#{ch}", { acao: "atualizado", id: self.id })
+  end
+
+  public
 end
