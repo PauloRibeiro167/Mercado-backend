@@ -1,5 +1,5 @@
 class Admin::Perfil < ApplicationRecord
-  self.table_name = 'perfis'
+  self.table_name = 'perfils'
   # Associação com a tabela de junção entre perfis e usuários
   has_many :usuario_perfis, class_name: "UsuarioPerfil", dependent: :destroy
   has_many :usuarios, through: :usuario_perfis, class_name: "Admin::Usuario"
@@ -13,4 +13,14 @@ class Admin::Perfil < ApplicationRecord
 
   validates :descricao,
             presence: { message: "Descrição não pode ficar em branco" }
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("#{ch}", { acao: "atualizado", id: self.id })
+  end
+
+  public
 end
