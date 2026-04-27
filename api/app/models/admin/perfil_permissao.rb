@@ -1,5 +1,5 @@
 class Admin::PerfilPermissao < ApplicationRecord
-  self.table_name = 'perfil_permissoes'
+#{injection}  self.table_name = 'perfil_permissoes'
   
   belongs_to :perfil
   belongs_to :permissao
