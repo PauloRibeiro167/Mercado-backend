@@ -1,5 +1,17 @@
 class Admin::Permissao < ApplicationRecord
-#{injection}  has_many :perfil_permissoes, class_name: "PerfilPermissao", dependent: :destroy
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("permissaos_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
+  has_many :perfil_permissoes, class_name: "PerfilPermissao", dependent: :destroy
   has_many :perfis, through: :perfil_permissoes
 
   # Validações
