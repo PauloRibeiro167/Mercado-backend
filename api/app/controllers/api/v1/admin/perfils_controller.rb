@@ -7,9 +7,31 @@ end
 
 # GET /perfils
 def index
-  @perfils = Admin::Perfil.all
-  render json: @perfils.map { |perfil| format_perfil_json(perfil) }
-end
+    ultimo_atualizado = Admin::Perfil.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @perfils = Admin::Perfil.all
+      render json: @perfils.map { |item| format_perfil_json(item) }
+    end
+  end
+
+  # GET /perfils/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @perfils_alterados = Admin::Perfil.where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @perfils_alterados.map { |item| format_perfil_json(item) }
+    }
+  end
 
 # GET /perfils/1
 def show
