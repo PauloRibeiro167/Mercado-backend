@@ -7,9 +7,31 @@ end
 
 # GET /funcionarios
 def index
-  @funcionarios = Funcionario.all
-  render json: @funcionarios.map { |funcionario| format_funcionario_json(funcionario) }
-end
+    ultimo_atualizado = Funcionario.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @funcionarios = Funcionario.all
+      render json: @funcionarios.map { |item| format_funcionario_json(item) }
+    end
+  end
+
+  # GET /funcionarios/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @funcionarios_alterados = Funcionario.where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @funcionarios_alterados.map { |item| format_funcionario_json(item) }
+    }
+  end
 
 # GET /funcionarios/1
 def show
