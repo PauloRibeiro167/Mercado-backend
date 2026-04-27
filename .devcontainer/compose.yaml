@@ -4,10 +4,10 @@ services:
       context: ..
       dockerfile: .devcontainer/Dockerfile
       args:
-        LOCAL_UID: ${LOCAL_UID}
+        LOCAL_UID: ${LOCAL_UID:-1000}
         PULL: true
-    container_name: ${CONTAINER_NAME_BACKEND}
-    image: ${PROJECT_NAME}_backend:latest
+    container_name: ${CONTAINER_NAME_BACKEND:-mercado-backend-app}
+    image: ${PROJECT_NAME:-mercado-app}_backend:latest
     pull_policy: build
     entrypoint: ["bash", "/usr/local/bin/entrypoint.sh"]
     volumes:
@@ -20,34 +20,50 @@ services:
     environment:
       - SERVICE_TYPE=backend
       - BINDING=0.0.0.0
+      - DB_HOST=postgres-primary
+      - DB_REPL_HOST=postgres-replica
     ports:
       - "${BACKEND_PORT:-3000}:3000"
     depends_on:
       - postgres-primary
       - redis
+    networks:
+      mercado_network:
+        aliases:
+          - postgres-primary
 
   postgres-primary:
-    image: postgres:18.3
-    container_name: ${CONTAINER_NAME_DB}_primary
+    image: postgres:16.3
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-mercado_db}
+    env_file:
+      - ../.env.development
     ports:
       - "${DB_PORT:-5432}:5432"
+    networks:
+      mercado_network:
+        aliases:
+          - postgres-primary
     volumes:
       - pgdata_primary:/var/lib/postgresql/data
       - ./db_setup/setup-primary.sh:/docker-entrypoint-initdb.d/setup-primary.sh:ro
 
   postgres-replica:
-    image: postgres:18.3
-    container_name: ${CONTAINER_NAME_DB}_replica
+    image: postgres:16.3
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-mercado_db}
+    env_file:
+      - ../.env.development
     ports:
       - "5433:5432"
+    networks:
+      mercado_network:
+        aliases:
+          - postgres-replica
     volumes:
       - pgdata_replica:/var/lib/postgresql/data
       - ./db_setup/replica-entrypoint.sh:/usr/local/bin/replica-entrypoint.sh:ro
@@ -58,10 +74,12 @@ services:
 
   redis:
     image: redis:7.2-alpine
-    container_name: ${PROJECT_NAME}_redis
+    container_name: ${PROJECT_NAME:-mercado-app}_redis
     command: redis-server --appendonly yes
     ports:
       - "6379:6379"
+    networks:
+      - mercado_network
     volumes:
       - redisdata:/data
 
@@ -69,3 +87,6 @@ volumes:
   pgdata_primary:
   pgdata_replica:
   redisdata:
+networks:
+  mercado_network:
+    driver: bridge

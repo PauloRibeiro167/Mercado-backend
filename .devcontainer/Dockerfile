@@ -65,14 +65,11 @@ WORKDIR /workspaces/backend
 # Copiar arquivos de dependências
 COPY api/Gemfile api/Gemfile.lock ./
 
-# Instalar dependências do projeto
-RUN bundle install
-
 # Atualizar dependências das gems
 RUN gem update
 
-# Instalar o YARD para documentação
-RUN bundle exec gem install yard
+# Instalar dependências do projeto
+RUN bundle install
 
 # =============================================================================
 # Configurar PATH para incluir binários das gems
@@ -100,7 +97,7 @@ RUN \
 # =============================================================================
 
 # Copiar script de entrypoint que cria usuário em tempo de execução
-COPY .devcontainer/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY .devcontainer/db_setup/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # =============================================================================

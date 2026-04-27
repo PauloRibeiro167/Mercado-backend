@@ -1,2 +1,0 @@
-class ParcelasContaPagar < ApplicationRecord
-end

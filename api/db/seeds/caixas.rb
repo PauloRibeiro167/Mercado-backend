@@ -1,10 +1,10 @@
 require "rainbow"
 
-usuario = Usuario.first
+usuario = Admin::Usuario.first
 
 config = {
   table_name: "caixas",
-  model_class: Caixa,
+  model_class: Pdv::Caixa,
   singular: "caixa",
   plural: "caixas",
   recriar_env_var: "RECRIAR_CAIXAS",

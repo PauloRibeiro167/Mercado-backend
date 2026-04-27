@@ -2,7 +2,7 @@ require "rainbow"
 
 config = {
   table_name: "produto_fornecedors",
-  model_class: ProdutoFornecedor,
+  model_class: Estoque::ProdutoFornecedor,
   singular: "produto_fornecedor",
   plural: "produtos_fornecedor",
   recriar_env_var: "RECRIAR_PRODUTO_FORNECEDORS",
@@ -32,21 +32,21 @@ begin
 
     config[:data].each do |record_attrs|
       begin
-        produto = Produto.find_by(nome: record_attrs[:produto_nome])
+        produto = Estoque::Produto.find_by(nome: record_attrs[:produto_nome])
         unless produto
           erros_ao_criar << { item: "produto #{record_attrs[:produto_nome]}", erro: "Produto não encontrado" }
           puts "Erro ao processar #{config[:singular]} para produto #{record_attrs[:produto_nome]}: Produto não encontrado"
           next
         end
 
-        fornecedor = Fornecedor.find_by(nome: record_attrs[:fornecedor_nome])
+        fornecedor = Estoque::Fornecedor.find_by(nome: record_attrs[:fornecedor_nome])
         unless fornecedor
           erros_ao_criar << { item: "fornecedor #{record_attrs[:fornecedor_nome]}", erro: "Fornecedor não encontrado" }
           puts "Erro ao processar #{config[:singular]} para fornecedor #{record_attrs[:fornecedor_nome]}: Fornecedor não encontrado"
           next
         end
 
-        usuario = Usuario.find_by(email: record_attrs[:usuario_email])
+        usuario = Admin::Usuario.find_by(email: record_attrs[:usuario_email])
         unless usuario
           erros_ao_criar << { item: "usuario #{record_attrs[:usuario_email]}", erro: "Usuário não encontrado" }
           puts "Erro ao processar #{config[:singular]} para usuario #{record_attrs[:usuario_email]}: Usuário não encontrado"

@@ -28,6 +28,7 @@ gem "puma", ">= 5.0"
 # Caching and Background Jobs
 gem "solid_cache"
 gem "solid_queue"
+gem "solid_cable"
 
 # Performance
 gem "bootsnap", require: false

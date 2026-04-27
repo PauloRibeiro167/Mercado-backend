@@ -2,7 +2,7 @@ require 'rainbow'
 
 config = {
   table_name: "Roles",
-  model_class: Role,
+  model_class: Admin::Role,
   singular: "role",
   plural: "roles",
   recriar_env_var: 'RECRIAR_ROLES',

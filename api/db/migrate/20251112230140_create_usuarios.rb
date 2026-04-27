@@ -13,7 +13,7 @@ class CreateUsuarios < ActiveRecord::Migration[8.0]
       t.string :nome_usuario
 
       # Referência correta para role
-      t.references :role, foreign_key: true, null: false  # Corrigido: remova ':usuario,'
+      t.references :role, foreign_key: true, null: false
 
       # Controle de Acesso e Status
       t.integer :status, null: false, default: 0
@@ -29,5 +29,9 @@ class CreateUsuarios < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_index :usuarios, :email, unique: true
+    add_index :usuarios, :nome_usuario, unique: true
+    add_index :usuarios, :token_redefinicao_senha, unique: true
   end
 end

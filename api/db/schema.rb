@@ -543,6 +543,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_06_123721) do
     t.index ["usuario_id"], name: "index_promocaos_on_usuario_id"
   end
 
+  create_table "registro_pausas", force: :cascade do |t|
+    t.bigint "funcionario_id", null: false
+    t.datetime "inicio", null: false
+    t.datetime "fim"
+    t.string "tipo_pausa", null: false
+    t.integer "status", default: 0, null: false
+    t.text "justificativa"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["funcionario_id"], name: "index_registro_pausas_on_funcionario_id"
+  end
+
   create_table "registro_pontos", force: :cascade do |t|
     t.bigint "funcionario_id"
     t.date "data"
@@ -717,6 +729,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_06_123721) do
   add_foreign_key "produtos", "categoria", column: "categoria_id"
   add_foreign_key "promocaos", "produtos"
   add_foreign_key "promocaos", "usuarios"
+  add_foreign_key "registro_pausas", "funcionarios"
   add_foreign_key "registro_pontos", "funcionarios"
   add_foreign_key "sessao_caixas", "caixas"
   add_foreign_key "sessao_caixas", "usuarios"

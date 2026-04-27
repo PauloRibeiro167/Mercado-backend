@@ -2,7 +2,7 @@ require "rainbow"
 
 config = {
   table_name: "folha_pagamentos",
-  model_class: FolhaPagamento,
+  model_class: Rh::FolhaPagamento,
   singular: "folha_pagamento",
   plural: "folha_pagamentos",
   recriar_env_var: "RECRIAR_FOLHA_PAGAMENTOS",
@@ -38,14 +38,14 @@ begin
 
     config[:data].each do |record_attrs|
       begin
-        funcionario = Funcionario.find_by(nome: record_attrs[:funcionario_nome])
+        funcionario = Rh::Funcionario.find_by(nome: record_attrs[:funcionario_nome])
         unless funcionario
           erros_ao_criar << { item: "funcionario #{record_attrs[:funcionario_nome]}", erro: "Funcionário não encontrado" }
           puts "Erro ao processar #{config[:singular]} para funcionario #{record_attrs[:funcionario_nome]}: Funcionário não encontrado"
           next
         end
 
-        usuario = Usuario.find_by(email: record_attrs[:usuario_email])
+        usuario = Admin::Usuario.find_by(email: record_attrs[:usuario_email])
         unless usuario
           erros_ao_criar << { item: "usuario #{record_attrs[:usuario_email]}", erro: "Usuário não encontrado" }
           puts "Erro ao processar #{config[:singular]} para usuario #{record_attrs[:usuario_email]}: Usuário não encontrado"

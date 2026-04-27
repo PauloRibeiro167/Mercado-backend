@@ -9,25 +9,39 @@ development:
   primary:
     <<: *default
     database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>
-    host: postgres-primary
+    # Make host configurable to support local/dev environments and containerized setups
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
     port: 5432
   primary_replica:
     <<: *default
     database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>
-    host: postgres-replica
+    host: <%= ENV.fetch("DB_REPL_HOST") { "localhost" } %>
     port: 5432
     replica: true
+  cache:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>_cache
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
+  queue:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>_queue
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
+  cable:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>_cable
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
 
 test:
   primary:
     <<: *default
     database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>_test
-    host: postgres-primary
+    # Make host configurable to align with containerized environments
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
     port: 5432
   primary_replica:
     <<: *default
     database: <%= ENV.fetch("POSTGRES_DB") { "mercado_backend_development" } %>_test
-    host: postgres-replica
+    host: <%= ENV.fetch("DB_REPL_HOST") { "localhost" } %>
     port: 5432
     replica: true
 
@@ -37,13 +51,32 @@ production:
     database: mercado_backend_production
     username: mercado_backend
     password: <%= ENV["MERCADO_BACKEND_DATABASE_PASSWORD"] %>
-    host: postgres-primary
+    # Host configurable to support different deployment topologies
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
     port: 5432
   primary_replica:
     <<: *default
     database: mercado_backend_production
     username: mercado_backend
     password: <%= ENV["MERCADO_BACKEND_DATABASE_PASSWORD"] %>
-    host: postgres-replica
+    host: <%= ENV.fetch("DB_REPL_HOST") { "localhost" } %>
     port: 5432
     replica: true
+  cache:
+    <<: *default
+    database: mercado_backend_production_cache
+    username: mercado_backend
+    password: <%= ENV["MERCADO_BACKEND_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
+  queue:
+    <<: *default
+    database: mercado_backend_production_queue
+    username: mercado_backend
+    password: <%= ENV["MERCADO_BACKEND_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>
+  cable:
+    <<: *default
+    database: mercado_backend_production_cable
+    username: mercado_backend
+    password: <%= ENV["MERCADO_BACKEND_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("DB_HOST") { "localhost" } %>

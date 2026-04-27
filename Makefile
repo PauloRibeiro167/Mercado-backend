@@ -33,8 +33,8 @@ help:
 	@printf "  $(BLUE)rebuild$(NC)      		$(YELLOW)- Força o rebuild da imagem e recria os containers.$(NC)\n"
 	@printf "  $(BLUE)up$(NC)           		$(YELLOW)- Sobe os containers e faz build se necessário.$(NC)\n"
 	@printf "  $(BLUE)down$(NC)         		$(YELLOW)- Para e remove todos os containers abertos.$(NC)\n"
-	@printf "  $(BLUE)exec$(NC)         		$(YELLOW)- Inicia backend (-d) e abre shell no workspace do projeto.$(NC)\n"
-	@printf "  $(BLUE)exec-workspace$(NC)		$(YELLOW)- Abre shell no workspace do projeto (sem iniciar backend).$(NC)\n"
+	@printf "  $(BLUE)exec$(NC)         		$(YELLOW)- Abre shell no workspace do projeto.$(NC)\n"
+	@printf "  $(BLUE)exec-workspace$(NC)		$(YELLOW)- Abre shell no workspace do projeto.$(NC)\n"
 	@printf "  $(BLUE)exec-backend$(NC)		$(YELLOW)- Abre shell no container do backend.$(NC)\n"
 	@printf "  $(BLUE)logs$(NC)         		$(YELLOW)- Mostra os logs do container do backend.$(NC)\n"
 	@printf "  $(BLUE)ps$(NC)           		$(YELLOW)- Lista os containers do projeto.$(NC)\n"
@@ -45,9 +45,9 @@ build:
 	@printf "$(CYAN)Build da imagem Docker...$(NC)\n"
 	@if [ "$(NOCACHE)" = "1" ]; then \
 		printf "$(YELLOW)Build sem cache ativado.$(NC)\n"; \
-		docker build --no-cache -f $(DOCKERFILE) -t $(IMAGE_NAME) .; \
+		$(DOCKER) build --no-cache; \
 	else \
-		docker build -f $(DOCKERFILE) -t $(IMAGE_NAME) .; \
+		$(DOCKER) build; \
 	fi
 
 build-no-cache:
@@ -75,18 +75,18 @@ up:
 
 down:
 	@printf "$(YELLOW)Parando o servidor Rails se estiver rodando...$(NC)\n"
-	@$(DOCKER) exec $(APP_SERVICE_BACKEND) bash -lc '\
-	if [ -f /workspaces/api/tmp/pids/server.pid ]; then \
-	  pid=$$(cat /workspaces/api/tmp/pids/server.pid 2>/dev/null || true); \
-	  if [ -n "$$pid" ]; then kill -9 "$$pid" 2>/dev/null || true; fi; \
-	  rm -f /workspaces/api/tmp/pids/server.pid; \
-	fi' 2>/dev/null || true
+	@$(DOCKER) exec $(APP_SERVICE_BACKEND) bash -lc 'if [ -f /workspaces/api/tmp/pids/server.pid ]; then pid=$$(cat /workspaces/api/tmp/pids/server.pid 2>/dev/null || true); [ -n "$$pid" ] && kill -9 "$$pid" 2>/dev/null || true; rm -f /workspaces/api/tmp/pids/server.pid; fi' 2>/dev/null || true
 	@printf "$(YELLOW)Parando e removendo todos os containers, volumes e redes do projeto...$(NC)\n"
 	@$(DOCKER) down -v --remove-orphans
+	@if command -v lsof > /dev/null; then \
+		pid=$$(lsof -t -i:$(BACKEND_PORT) 2>/dev/null || true); \
+		if [ -n "$$pid" ]; then \
+			printf "$(YELLOW)Liberando porta $(BACKEND_PORT) no host (PID: $$pid)...$(NC)\n"; \
+			kill -9 $$pid 2>/dev/null || true; \
+		fi; \
+	fi
 
 exec:
-	@printf "$(CYAN)Iniciando backend Rails em background...$(NC)\n"
-	@$(MAKE) start-backend
 	@printf "$(CYAN)Abrindo workspace do projeto...$(NC)\n"
 	@$(MAKE) exec-workspace
 
@@ -137,19 +137,19 @@ ps:
 db-shell:
 	@printf "$(GREEN)Abrindo shell do banco de dados no serviço postgres... (Ctrl+D para sair)$(NC)\n"
 	@printf "$(YELLOW)DEBUG: DB_USER=%s DB_NAME=%s$(NC)\n" "$(DB_USER)" "$(DB_NAME)"
-	@container_id=$$($(DOCKER) ps --status=running -q postgres); \
+	@container_id=$$($(DOCKER) ps --status=running -q postgres-primary); \
 	if [ -z "$$container_id" ]; then \
 		printf "$(YELLOW)Container do serviço postgres não encontrado. Tentando iniciar com 'make up'...$(NC)\n"; \
 		$(MAKE) up; \
 		sleep 10; \
-		container_id=$$($(DOCKER) ps --status=running -q postgres); \
+		container_id=$$($(DOCKER) ps --status=running -q postgres-primary); \
 		if [ -z "$$container_id" ]; then \
 			printf "$(RED)Falha ao iniciar ou encontrar o container do serviço postgres. Verifique os logs.$(NC)\n"; \
 			exit 1; \
 		fi; \
 	fi; \
 	printf "$(GREEN)Container do banco de dados encontrado: %s$(NC)\n" "$$container_id"; \
-	$(DOCKER) exec -it postgres psql -U "$(DB_USER)" "$(DB_NAME)"
+	$(DOCKER) exec -it postgres-primary psql -U "$(DB_USER)" "$(DB_NAME)"
 
 
 clean:
@@ -207,32 +207,6 @@ env-check:
 rm-env:
 	@echo "Se existir .devcontainer/.env.devcontainer.example e você quiser removê-lo, execute:" \
 		&& echo "  rm .devcontainer/.env.devcontainer.example" || true
-
-start-backend:
-	@set -e; \
-	container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_BACKEND) 2>/dev/null) || true; \
-	if [ -z "$$container_id" ]; then \
-		$(MAKE) up; \
-		sleep 4; \
-		container_id=$$($(DOCKER) ps --status=running -q $(APP_SERVICE_BACKEND) 2>/dev/null) || true; \
-		[ -z "$$container_id" ] && printf "$(RED)Falha ao iniciar o container do backend.$(NC)\n" && exit 1; \
-	fi; \
-	detected_dir=$$($(DOCKER) exec $(APP_SERVICE_BACKEND) bash -lc '\
-		set -e; cand=""; \
-		if [ -d "$(BACKEND_WORKDIR)" ] && [ -e "$(BACKEND_WORKDIR)/bin/rails" ]; then cand="$(BACKEND_WORKDIR)"; \
-		else for d in /workspaces/backend /workspace/backend /workspaces/*/backend /app /srv/app; do \
-			if [ -d "$$d" ] && [ -e "$$d/bin/rails" ]; then cand="$$d"; break; fi; \
-		done; fi; echo "$$cand"'); \
-	if [ -z "$$detected_dir" ]; then \
-		printf "$(RED)Não foi possível detectar o diretório do backend dentro do container.$(NC)\n"; \
-		exit 1; \
-	fi; \
-	$(DOCKER) exec $(APP_SERVICE_BACKEND) bash -lc 'cd "'"$$detected_dir"'"; \
-	if [ -f tmp/pids/server.pid ]; then \
-	  pid=$$(cat tmp/pids/server.pid 2>/dev/null || true); \
-	  if [ -n "$$pid" ]; then kill -9 "$$pid" 2>/dev/null || true; fi; \
-	  rm -f tmp/pids/server.pid; \
-	fi'
 
 exec-workspace:
 	@set -e; \

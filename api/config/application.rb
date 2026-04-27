@@ -11,7 +11,7 @@ require "action_controller/railtie"
 require "action_mailbox/engine"
 require "action_text/engine"
 require "action_view/railtie"
-# require "action_cable/engine"
+require "action_cable/engine"
 require "rails/test_unit/railtie"
 
 # Require the gems listed in Gemfile, including any gems
@@ -42,6 +42,11 @@ module MercadoBackend
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # Enable cookies and sessions BEFORE the database selector middleware
+    config.middleware.insert_after ActionDispatch::RemoteIp, ActionDispatch::Cookies
+    config.middleware.insert_after ActionDispatch::Cookies, ActionDispatch::Session::CookieStore
+    config.session_store :cookie_store, key: "_mercado_backend_session"
 
     # Ativa a seleção automática de banco de dados (Primary vs Replica)
     config.active_record.database_selector = { delay: 2.seconds }

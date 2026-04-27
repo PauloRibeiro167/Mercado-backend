@@ -2,18 +2,18 @@ require "rainbow"
 
 
 # Verificar se o usuário e caixa existem
-usuario = Usuario.first || Usuario.create!(
+usuario = Admin::Usuario.first || Admin::Usuario.create!(
   nome: "Usuário Padrão",
   email: "seed@example.com",
   password: "123456",
   password_confirmation: "123456"
 )
-gerente = Usuario.second || usuario
-caixa = Caixa.first || Caixa.create!(nome: "Caixa Seed", saldo: 0.0, ativo: true, usuario: usuario)
+gerente = Admin::Usuario.second || usuario
+caixa = Pdv::Caixa.first || Pdv::Caixa.create!(nome: "Caixa Seed", saldo: 0.0, ativo: true, usuario: usuario)
 
 config = {
   table_name: "sessao_caixas",
-  model_class: SessaoCaixa,
+  model_class: Pdv::SessaoCaixa,
   singular: "sessao_caixa",
   plural: "sessao_caixas",
   recriar_env_var: "RECRIAR_SESSAO_CAIXAS",
@@ -69,7 +69,7 @@ begin
     config[:data].each do |record_attrs|
       begin
         # Verificar se já existe uma sessão aberta para o usuário
-        if SessaoCaixa.where(usuario_abertura: record_attrs[:usuario_abertura], status: :aberta).exists?
+        if Pdv::SessaoCaixa.where(usuario_abertura: record_attrs[:usuario_abertura], status: :aberta).exists?
           puts Rainbow("Sessão já aberta para o usuário #{record_attrs[:usuario_abertura].email}. Pulando criação.").yellow
           next
         end
