@@ -1,8 +1,9 @@
 class Admin::PerfilPermissao < ApplicationRecord
-
   include Discard::Model if defined?(Discard::Model)
 
-  after_commit :avisar_frontends, on: [:create, :update]
+  self.table_name = "perfil_permissoes"
+
+  after_commit :avisar_frontends, on: [ :create, :update ]
 
   private
 
@@ -11,8 +12,8 @@ class Admin::PerfilPermissao < ApplicationRecord
   end
 
   public
-  self.table_name = 'perfil_permissoes'
-  
+  self.table_name = "perfil_permissoes"
+
   belongs_to :perfil
   belongs_to :permissao
 
@@ -25,5 +26,4 @@ class Admin::PerfilPermissao < ApplicationRecord
   validates_uniqueness_of :permissao_id,
                           scope: :perfil_id,
                           message: "Permissão já está associada a este perfil"
-
 end
