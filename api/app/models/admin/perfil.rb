@@ -1,5 +1,17 @@
 class Admin::Perfil < ApplicationRecord
-#{injection}  self.table_name = 'perfils'
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("perfils_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
+  self.table_name = 'perfils'
   # Associação com a tabela de junção entre perfis e usuários
   has_many :usuario_perfis, class_name: "UsuarioPerfil", dependent: :destroy
   has_many :usuarios, through: :usuario_perfis, class_name: "Admin::Usuario"
