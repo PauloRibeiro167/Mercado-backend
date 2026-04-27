@@ -7,9 +7,31 @@ end
 
 # GET /metodo_pagamentos
 def index
-  @metodo_pagamentos = MetodoPagamento.all
-  render json: @metodo_pagamentos.map { |metodo| format_metodo_pagamento_json(metodo) }
-end
+    ultimo_atualizado = MetodoPagamento.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @metodo_pagamentos = MetodoPagamento.all
+      render json: @metodo_pagamentos.map { |item| format_metodo_pagamento_json(item) }
+    end
+  end
+
+  # GET /metodo_pagamentos/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @metodo_pagamentos_alterados = MetodoPagamento.where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @metodo_pagamentos_alterados.map { |item| format_metodo_pagamento_json(item) }
+    }
+  end
 
 # GET /metodo_pagamentos/1
 def show
