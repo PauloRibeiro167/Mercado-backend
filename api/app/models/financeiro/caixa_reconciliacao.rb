@@ -47,6 +47,18 @@ module Financeiro
   #   Mapa de motivos categorizados disponíveis.
   #   @return [Hash{String=>String}]
   class CaixaReconciliacao < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("caixa_reconciliacaos_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
     self.table_name = "caixa_reconciliacoes"
 
     # Enumera estados e motivos para facilitar filtros de auditoria.
