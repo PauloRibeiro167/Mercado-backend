@@ -1,5 +1,19 @@
 module Estoque
   class Lote < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("lotes_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
+  include Discard::Model
+
     belongs_to :produto
     has_many :item_vendas, dependent: :destroy
     has_one :estoque, dependent: :destroy
@@ -35,9 +49,7 @@ module Estoque
 
     def proximo_vencimento?
       dias_para_vencer && dias_para_vencer <= 30
-    end
-
-    private
+    end  private
 
     def criar_estoque
       Estoque.create(produto: produto, lote: self, quantidade_atual: quantidade_inicial)
