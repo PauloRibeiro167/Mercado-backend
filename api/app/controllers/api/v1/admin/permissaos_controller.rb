@@ -7,9 +7,31 @@ end
 
 # GET /permissaos
 def index
-  @permissaos = Admin::Permissao.all
-  render json: @permissaos.map { |permissao| format_permissao_json(permissao) }
-end
+    ultimo_atualizado = Admin::Permissao.maximum(:updated_at)
+    
+    if stale?(last_modified: ultimo_atualizado)
+      @permissaos = Admin::Permissao.all
+      render json: @permissaos.map { |item| format_permissao_json(item) }
+    end
+  end
+
+  # GET /permissaos/sync
+  def sync
+    data_ultima_sincronizacao = params[:desde]
+    
+    unless data_ultima_sincronizacao.present?
+      render json: { success: false, errors: ["O parâmetro 'desde' é obrigatório"] }, status: :bad_request
+      return
+    end
+    
+    @permissaos_alterados = Admin::Permissao.where('updated_at > ?', data_ultima_sincronizacao)
+    
+    render json: {
+      sucesso: true,
+      data_sincronizacao_atual: Time.current,
+      atualizados: @permissaos_alterados.map { |item| format_permissao_json(item) }
+    }
+  end
 
 # GET /permissaos/1
 def show
