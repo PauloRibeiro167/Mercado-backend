@@ -21,6 +21,18 @@ module Estoque
   # @!attribute [rw] updated_at
   #   @return [DateTime] Data e hora da última atualização do registro
   class Estoque < ApplicationRecord
+
+  include Discard::Model if defined?(Discard::Model)
+
+  after_commit :avisar_frontends, on: [:create, :update]
+
+  private
+
+  def avisar_frontends
+    ActionCable.server.broadcast("estoques_channel", { acao: "atualizado", id: self.id })
+  end
+
+  public
     # @!group Associações
 
     # Associação obrigatória com produto
@@ -90,15 +102,4 @@ module Estoque
       update(quantidade_atual: quantidade_atual + delta, ultima_atualizacao: Time.current)
       calcular_media_vendas_diarias if delta < 0  # Recalcula após venda
     end
-  end
-
-  after_commit :avisar_frontends, on: [:create, :update]
-
-  private
-
-  def avisar_frontends
-    ActionCable.server.broadcast("#{ch}", { acao: "atualizado", id: self.id })
-  end
-
-  public
-end
+  endend
